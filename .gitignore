@@ -1,0 +1,10 @@
+# dependencias (instalar com npm install)
+node_modules/
+
+# zip do codigo-fonte (e gerado, nao precisa de ir para o repositorio)
+public/taskflow-codigo-fonte.zip
+
+# logs e ficheiros do sistema
+*.log
+.DS_Store
+Thumbs.db
