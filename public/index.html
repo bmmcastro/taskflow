@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="pt" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow — gestão de tarefas em equipa</title>
+    <meta name="description" content="O TaskFlow ajuda a tua equipa a organizar projetos e tarefas, estilo Trello.">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6d28d9">
+    <link rel="apple-touch-icon" href="logo.svg">
+
+    <!-- tipografia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        /* ===== o nosso sistema de estilos ===== */
+        :root {
+            --grad: linear-gradient(135deg, #4f46e5 0%, #9333ea 55%, #db2777 100%);
+            --raio: 1rem;
+            --sombra: 0 10px 30px rgba(2, 6, 23, .08);
+            --sombra-forte: 0 .8rem 1.8rem rgba(2, 6, 23, .16);
+            /* cor da marca = primaria do bootstrap (botoes, links, etc. ficam todos roxos) */
+            --bs-primary: #7c3aed;
+            --bs-primary-rgb: 124, 58, 237;
+        }
+
+        /* todos os botoes com a mesma forma (pilula) */
+        .btn { border-radius: 50rem; font-weight: 600; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* acessibilidade: o que tem foco fica bem visivel */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, .cartao:focus-visible {
+            outline: 3px solid #6366f1;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        /* link para saltar direto ao conteudo (leitores de ecra / teclado) */
+        .saltar {
+            position: absolute;
+            left: -999px;
+            top: 0;
+            background: #fff;
+            padding: .5rem 1rem;
+            border-radius: 0 0 .5rem 0;
+            z-index: 2000;
+        }
+        .saltar:focus { left: 0; }
+
+        /* botao principal com o gradiente */
+        .btn-tf {
+            background: var(--grad);
+            color: #fff;
+            border: none;
+        }
+        .btn-tf:hover, .btn-tf:focus { color: #fff; filter: brightness(1.08); }
+
+        /* texto com o gradiente */
+        .texto-grad {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* cartoes */
+        .cartao {
+            border: none;
+            border-radius: var(--raio);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .cartao:hover { transform: translateY(-5px); box-shadow: var(--sombra-forte) !important; }
+
+        /* ===== pagina inicial (landing) ===== */
+        .topo-inicio {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+        }
+        .marca { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.3rem; }
+
+        .hero {
+            background: var(--grad);
+            color: #fff;
+            border-radius: 1.5rem;
+            padding: clamp(2rem, 5vw, 4.5rem);
+            position: relative;
+            overflow: hidden;
+        }
+        /* uns brilhos suaves no fundo do hero */
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 10%, rgba(255,255,255,.18), transparent 40%),
+                        radial-gradient(circle at 10% 90%, rgba(255,255,255,.12), transparent 35%);
+            pointer-events: none;
+        }
+        .hero h1 { font-weight: 800; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; }
+
+        /* circulo com emoji nas funcionalidades */
+        .func-icone {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            background: rgba(109, 40, 217, .1);
+        }
+
+        /* ===== ecra do login ===== */
+        .ecra-login-fundo {
+            background: var(--grad);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .caixa-login { max-width: 430px; width: 100%; }
+
+        /* ===== barra de topo (depois do login) ===== */
+        .navbar-tf { background: var(--grad); }
+
+        .projeto-icone {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            background: var(--grad);
+            color: #fff; font-weight: 700; font-size: 1.3rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* risca de estado nos cartoes de tarefa */
+        .estado-fazer { border-left: 6px solid #94a3b8; }
+        .estado-curso { border-left: 6px solid #f59e0b; }
+        .estado-concluida { border-left: 6px solid #22c55e; }
+
+        /* ===== quadro estilo trello ===== */
+        .board-coluna {
+            background: var(--bs-secondary-bg);
+            border-radius: var(--raio);
+            padding: .85rem;
+            height: 100%;
+            border-top: 4px solid var(--cor-col, #cbd5e1);
+        }
+        /* cada coluna tem um acento de cor conforme o estado */
+        .col-fazer { --cor-col: #94a3b8; }
+        .col-curso { --cor-col: #f59e0b; }
+        .col-concluida { --cor-col: #22c55e; }
+        .board-cabecalho { font-weight: 700; padding: .15rem .35rem .75rem; display: flex; align-items: center; gap: .4rem; }
+        /* bolinha de cor antes do titulo da coluna */
+        .board-cabecalho::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--cor-col, #cbd5e1); }
+        .board-cartoes { display: flex; flex-direction: column; gap: .75rem; min-height: 80px; }
+        .board-coluna.arrastar-por-cima { outline: 2px dashed var(--bs-primary); outline-offset: -4px; }
+        .board-cartoes .cartao { cursor: grab; }
+        .board-cartoes .cartao:active { cursor: grabbing; }
+
+        /* ===== mobile-first: ajustes para ecras pequenos ===== */
+        /* textos compridos (titulos, links, emails) nao rebentam o cartao */
+        .card-body, .board-cartoes { overflow-wrap: anywhere; word-break: break-word; }
+
+        @media (max-width: 575.98px) {
+            .hero { padding: 2rem 1.25rem; border-radius: 1rem; }
+            .hero h1 { font-size: 1.7rem; }
+            /* no telemovel, os botoes de cabecalho ocupam a linha toda e ficam fáceis de tocar */
+            #ecra-tarefas .d-flex.gap-2.flex-wrap .btn,
+            #ecra-projetos .btn-tf { width: 100%; }
+        }
+
+        /* quem prefere menos animacoes nao tem transformacoes */
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+            .cartao:hover { transform: none; }
+        }
+    </style>
+</head>
+<body class="bg-body-tertiary">
+
+    <a class="saltar" href="#conteudo">Saltar para o conteúdo</a>
+
+    <!-- ================= NAVBAR (sempre visivel) ================= -->
+    <nav id="barra-topo" class="navbar navbar-expand-lg navbar-tf shadow sticky-top" data-bs-theme="dark" aria-label="Barra principal">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="#" onclick="voltarAoInicio(); return false;">
+                <img src="logo.svg" alt="" width="32" height="32"> TaskFlow
+            </a>
+            <!-- botao hamburger (so aparece em ecras pequenos) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navConteudo" aria-controls="navConteudo" aria-expanded="false" aria-label="Abrir o menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navConteudo">
+                <!-- navegacao (esquerda) - sempre visivel -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#" onclick="voltarAoInicio(); return false;"><i class="bi bi-house-door me-1"></i>Início</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#" onclick="abrirSobre(); return false;"><i class="bi bi-info-circle me-1"></i>Sobre</a></li>
+                </ul>
+
+                <!-- zona da conta (direita) -->
+                <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                    <!-- risca a separar a navegacao da zona da conta (so em ecra grande) -->
+                    <li class="nav-item d-none d-lg-flex align-items-center"><div class="vr text-white opacity-50 mx-2" style="height: 1.6rem;"></div></li>
+
+                    <!-- sem login -->
+                    <li class="nav-item nav-deslogado"><a class="nav-link fw-semibold" href="#" onclick="irParaLogin(); return false;"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a></li>
+                    <li class="nav-item nav-deslogado"><a class="nav-link fw-semibold" href="#" onclick="irParaRegisto(); return false;"><i class="bi bi-person-plus me-1"></i>Registar</a></li>
+
+                    <!-- com login -->
+                    <li class="nav-item nav-logado" style="display: none;"><a class="nav-link fw-semibold" href="#" onclick="voltarAosProjetos(); return false;"><i class="bi bi-kanban me-1"></i>Projetos</a></li>
+                    <li class="nav-item nav-logado" style="display: none;"><a class="nav-link fw-semibold" href="#" onclick="abrirConta(); return false;"><i class="bi bi-person-gear me-1"></i>Conta</a></li>
+                    <li class="nav-item nav-logado" style="display: none;"><a class="nav-link fw-semibold" href="#" onclick="abrirConfig(); return false;"><i class="bi bi-activity me-1"></i>Estado da API</a></li>
+                    <li class="nav-item nav-logado" style="display: none;"><a class="nav-link fw-semibold" href="#" onclick="sair(); return false;"><i class="bi bi-box-arrow-right me-1"></i>Sair</a></li>
+
+                    <!-- modo claro/escuro: sempre visivel e sempre o ultimo -->
+                    <li class="nav-item my-1 my-lg-0">
+                        <button class="btn btn-sm btn-outline-light" onclick="mudarTema()" aria-label="Mudar tema claro/escuro" title="Mudar tema"><span id="icone-tema" aria-hidden="true"><i class="bi bi-moon-stars"></i></span></button>
+                    </li>
+                    <li class="nav-item d-none"><span id="nome-utilizador"></span></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= PAGINA INICIAL (landing) ================= -->
+    <div id="ecra-inicio" class="flex-grow-1">
+        <main id="conteudo" class="container my-4">
+            <!-- secao principal -->
+            <section class="hero text-center mb-5" aria-labelledby="titulo-hero">
+                <div class="position-relative">
+                    <img src="logo.svg" alt="TaskFlow" width="84" height="84" class="mb-3">
+                    <div><span class="badge bg-light text-dark rounded-pill mb-3 fw-semibold">Gestão de tarefas em equipa</span></div>
+                    <h1 id="titulo-hero" class="mb-3">Organiza o trabalho da tua equipa,<br>do princípio ao fim.</h1>
+                    <p class="lead mb-4 mx-auto opacity-75" style="max-width: 620px;">
+                        Cria projetos, divide tarefas por um quadro estilo Trello, acompanha o progresso com subtarefas e mantém toda a equipa a par.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <button class="btn btn-light btn-lg fw-bold px-4 nav-deslogado" onclick="irParaRegisto()">Começar agora</button>
+                        <button class="btn btn-outline-light btn-lg fw-semibold px-4 nav-deslogado" onclick="irParaLogin()">Já tenho conta</button>
+                        <button class="btn btn-light btn-lg fw-bold px-4 nav-logado" style="display: none;" onclick="voltarAosProjetos()"><i class="bi bi-kanban me-1"></i>Ver os meus projetos</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- funcionalidades -->
+            <section aria-labelledby="titulo-func">
+                <h2 id="titulo-func" class="text-center fw-bold mb-4">Tudo num só sítio</h2>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card cartao shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="func-icone mb-3" aria-hidden="true">🗂️</div>
+                                <h3 class="h5 fw-bold">Projetos e equipas</h3>
+                                <p class="text-secondary small mb-0">Cria projetos e junta os teus colegas como membros.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card cartao shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="func-icone mb-3" aria-hidden="true">📌</div>
+                                <h3 class="h5 fw-bold">Quadro estilo Trello</h3>
+                                <p class="text-secondary small mb-0">Arrasta as tarefas entre "Por fazer", "Em curso" e "Concluída".</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card cartao shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="func-icone mb-3" aria-hidden="true">☑️</div>
+                                <h3 class="h5 fw-bold">Subtarefas</h3>
+                                <p class="text-secondary small mb-0">Divide cada tarefa numa checklist e vê a percentagem feita.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card cartao shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="func-icone mb-3" aria-hidden="true">📊</div>
+                                <h3 class="h5 fw-bold">Relatórios</h3>
+                                <p class="text-secondary small mb-0">Vê quantas tarefas faltam e quem está a fazer o quê.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5 nav-deslogado">
+                    <button class="btn btn-tf btn-lg px-5" onclick="irParaRegisto()">Criar a minha conta</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <!-- ================= ECRA SOBRE ================= -->
+    <div id="ecra-sobre" class="container my-5 flex-grow-1" style="display: none;">
+        <div class="text-center mb-5">
+            <img src="logo.svg" alt="TaskFlow" width="76" height="76" class="mb-3">
+            <h1 class="fw-bold texto-grad">Sobre o TaskFlow</h1>
+            <p class="lead text-secondary mb-0">Projeto final de <strong>UC00605 — Programar para a web (server-side)</strong></p>
+            <p class="text-secondary">Formador: Nuno Carapito</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                <a class="btn btn-primary" href="taskflow-codigo-fonte.zip" download><i class="bi bi-file-earmark-zip me-1"></i>Descarregar o código-fonte (.zip)</a>
+                <a class="btn btn-outline-secondary" href="https://github.com/bmmcastro/taskflow" target="_blank" rel="noopener"><i class="bi bi-github me-1"></i>Ver no GitHub</a>
+            </div>
+        </div>
+
+        <!-- o que e -->
+        <section class="mb-5" aria-labelledby="sobre-oque">
+            <h2 id="sobre-oque" class="h4 fw-bold mb-3">O que é</h2>
+            <p>O TaskFlow é uma aplicação de gestão de tarefas em equipa, no estilo do Trello. Cada utilizador cria conta e faz login, vê os <strong>projetos</strong> onde é membro, e dentro de cada projeto organiza as <strong>tarefas</strong> num quadro com colunas (arrastando os cartões para mudar o estado). Cada tarefa pode ter <strong>subtarefas</strong> com percentagem de conclusão, e há ainda um <strong>relatório</strong> do projeto.</p>
+        </section>
+
+        <!-- funcionalidades -->
+        <section class="mb-5" aria-labelledby="sobre-func">
+            <h2 id="sobre-func" class="h4 fw-bold mb-3">Funcionalidades</h2>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-person-check"></i></div><h3 class="h6 fw-bold">Contas e login</h3><p class="text-secondary small mb-0">Registo e login, com a password guardada de forma segura (hash).</p></div></div></div>
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-people"></i></div><h3 class="h6 fw-bold">Projetos e equipas</h3><p class="text-secondary small mb-0">Criar projetos e juntar/remover membros.</p></div></div></div>
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-kanban"></i></div><h3 class="h6 fw-bold">Quadro estilo Trello</h3><p class="text-secondary small mb-0">Colunas por estado e arrastar para mudar de coluna.</p></div></div></div>
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-check2-square"></i></div><h3 class="h6 fw-bold">Subtarefas</h3><p class="text-secondary small mb-0">Checklist por tarefa com percentagem feita.</p></div></div></div>
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-bar-chart"></i></div><h3 class="h6 fw-bold">Relatórios</h3><p class="text-secondary small mb-0">Total, concluídas e contagem por pessoa.</p></div></div></div>
+                <div class="col-md-6 col-lg-4"><div class="card cartao shadow-sm h-100"><div class="card-body"><div class="func-icone mb-2" aria-hidden="true"><i class="bi bi-phone"></i></div><h3 class="h6 fw-bold">PWA + tema</h3><p class="text-secondary small mb-0">Instalável no telemóvel, responsiva e com modo claro/escuro.</p></div></div></div>
+            </div>
+        </section>
+
+        <!-- como foi feito -->
+        <section class="mb-5" aria-labelledby="sobre-arq">
+            <h2 id="sobre-arq" class="h4 fw-bold mb-3">Como foi feito (técnicas)</h2>
+            <ul class="list-group shadow-sm">
+                <li class="list-group-item"><strong>Arquitetura MVC:</strong> rotas → controllers (com <code>try/catch</code>) → <strong>model</strong> (camada de persistência) → base de dados.</li>
+                <li class="list-group-item"><strong>Base de dados PostgreSQL</strong> com <em>prepared statements</em> (<code>$1</code>) — protege contra injeção de SQL.</li>
+                <li class="list-group-item"><strong>Passwords com hash</strong> (sha256) — nunca em texto simples.</li>
+                <li class="list-group-item"><strong>Proteção contra XSS</strong> — o texto do utilizador é escapado antes de aparecer no ecrã.</li>
+                <li class="list-group-item"><strong>Validação no servidor</strong> e <strong>autorização</strong> (só o criador apaga o projeto; o criador não pode ser removido).</li>
+                <li class="list-group-item"><strong>PWA</strong> (manifest + service worker), design <strong>responsivo (mobile-first)</strong> e cuidados de <strong>acessibilidade</strong>.</li>
+            </ul>
+        </section>
+
+        <!-- tecnologias -->
+        <section class="mb-5" aria-labelledby="sobre-tec">
+            <h2 id="sobre-tec" class="h4 fw-bold mb-3">Tecnologias</h2>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Node.js</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Express</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Cors</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">pg</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">PostgreSQL</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">HTML</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Bootstrap</span>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">JavaScript</span>
+            </div>
+        </section>
+
+        <!-- estado da api ao vivo (alexandre) -->
+        <section class="mb-5" aria-labelledby="sobre-api">
+            <h2 id="sobre-api" class="h4 fw-bold mb-3">Estado da API <span id="sobre-api-geral" class="badge bg-secondary rounded-pill align-middle">a verificar…</span></h2>
+            <p class="text-secondary">Estes são os principais endereços da API. Ao abrir esta página testamos cada um (só leitura) e mostramos se está a responder.</p>
+            <div id="sobre-api-lista" class="list-group shadow-sm" aria-live="polite">
+                <div class="list-group-item text-secondary small">A verificar os endereços…</div>
+            </div>
+        </section>
+
+        <!-- a equipa -->
+        <section aria-labelledby="sobre-equipa">
+            <h2 id="sobre-equipa" class="h4 fw-bold mb-3">A equipa</h2>
+            <p class="text-secondary">Dividimos o trabalho por recurso: cada um fez a rota, o controller e o model do seu recurso, mais a parte do frontend.</p>
+            <div class="row g-3">
+                <div class="col-md-6"><div class="card cartao shadow-sm h-100"><div class="card-body"><h3 class="h6 fw-bold mb-1">Bruno</h3><p class="text-secondary small mb-0">Configuração e base de dados, o recurso das <strong>Tarefas</strong> e a estrutura do frontend (página inicial e quadro Trello).</p></div></div></div>
+                <div class="col-md-6"><div class="card cartao shadow-sm h-100"><div class="card-body"><h3 class="h6 fw-bold mb-1">Diogo</h3><p class="text-secondary small mb-0">Recurso dos <strong>Utilizadores</strong>: registo, login, gestão de conta. Ecrãs de login/registo.</p></div></div></div>
+                <div class="col-md-6"><div class="card cartao shadow-sm h-100"><div class="card-body"><h3 class="h6 fw-bold mb-1">Nelson</h3><p class="text-secondary small mb-0">Recurso dos <strong>Projetos e membros</strong> e o relatório do projeto.</p></div></div></div>
+                <div class="col-md-6"><div class="card cartao shadow-sm h-100"><div class="card-body"><h3 class="h6 fw-bold mb-1">Alexandre</h3><p class="text-secondary small mb-0">Recurso das <strong>Subtarefas</strong> e a página "Estado da API".</p></div></div></div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- ================= ECRA DO LOGIN / REGISTO ================= -->
+    <div id="ecra-login" class="ecra-login-fundo" style="display: none;">
+        <div class="caixa-login p-3">
+
+            <div class="text-center mb-4 text-white">
+                <img src="logo.svg" alt="TaskFlow" width="72" height="72" class="mb-2">
+                <h1 class="fw-bold mb-1">TaskFlow</h1>
+                <p class="mb-0 opacity-75">Gestão de tarefas em equipa</p>
+            </div>
+
+            <!-- formulario do login -->
+            <div id="form-login" class="card cartao shadow-lg">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4 fw-bold">Entrar</h2>
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label fw-semibold">Email</label>
+                        <input type="email" id="login-email" class="form-control form-control-lg" placeholder="exemplo@taskflow.pt" autocomplete="email">
+                    </div>
+                    <div class="mb-4">
+                        <label for="login-password" class="form-label fw-semibold">Password</label>
+                        <input type="password" id="login-password" class="form-control form-control-lg" placeholder="A tua password" autocomplete="current-password">
+                    </div>
+                    <button class="btn btn-tf btn-lg w-100" onclick="fazerLogin()">Entrar</button>
+                    <p class="text-center mt-4 mb-0 small">
+                        Ainda não tens conta?
+                        <a href="#" class="fw-semibold text-decoration-none" onclick="mostrarRegisto()">Regista-te aqui</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- formulario do registo (comeca escondido) -->
+            <div id="form-registo" class="card cartao shadow-lg" style="display: none;">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4 fw-bold">Criar conta</h2>
+                    <div class="mb-3">
+                        <label for="registo-nome" class="form-label fw-semibold">Nome</label>
+                        <input type="text" id="registo-nome" class="form-control form-control-lg" placeholder="O teu nome" autocomplete="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="registo-email" class="form-label fw-semibold">Email</label>
+                        <input type="email" id="registo-email" class="form-control form-control-lg" placeholder="exemplo@taskflow.pt" autocomplete="email">
+                    </div>
+                    <div class="mb-4">
+                        <label for="registo-password" class="form-label fw-semibold">Password</label>
+                        <input type="password" id="registo-password" class="form-control form-control-lg" placeholder="Escolhe uma password" autocomplete="new-password">
+                    </div>
+                    <button class="btn btn-success btn-lg w-100 fw-bold" onclick="fazerRegisto()">Criar conta</button>
+                    <p class="text-center mt-4 mb-0 small">
+                        Já tens conta?
+                        <a href="#" class="fw-semibold text-decoration-none" onclick="mostrarLogin()">Entra aqui</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="#" class="text-white text-decoration-none small opacity-75" onclick="voltarAoInicio()">← Voltar ao início</a>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <!-- ================= ECRA DOS PROJETOS ================= -->
+    <div id="ecra-projetos" class="container my-5 flex-grow-1" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold texto-grad mb-0">Os meus projetos</h2>
+            <button class="btn btn-tf btn-lg" onclick="abrirModalProjeto()">+ Novo Projeto</button>
+        </div>
+
+        <div id="aviso-sem-projetos" class="alert alert-info text-center rounded-4 py-4" style="display: none;">
+            Ainda não tens projetos. Cria o primeiro! 🚀
+        </div>
+
+        <div id="lista-projetos" class="row g-4"></div>
+    </div>
+
+
+    <!-- ================= ECRA DAS TAREFAS (quadro) ================= -->
+    <div id="ecra-tarefas" class="container my-5 flex-grow-1" style="display: none;">
+
+        <button class="btn btn-link text-decoration-none px-0 mb-2" onclick="voltarAosProjetos()">← Voltar aos projetos</button>
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 id="titulo-projeto" class="fw-bold texto-grad mb-0"></h2>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-primary fw-semibold" onclick="abrirMembros()">👥 Membros</button>
+                <button class="btn btn-outline-primary fw-semibold" onclick="abrirRelatorio()">📊 Relatório</button>
+                <button class="btn btn-tf" onclick="abrirModalTarefa()">+ Nova Tarefa</button>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 flex-wrap mb-4 bg-body p-3 rounded-4 shadow-sm">
+            <div class="d-flex align-items-center gap-2">
+                <label for="filtro-responsavel" class="fw-semibold mb-0">👤 Pessoa:</label>
+                <select id="filtro-responsavel" class="form-select form-select-sm w-auto rounded-pill" onchange="aplicarFiltros()">
+                    <option value="Todos">Todas</option>
+                </select>
+            </div>
+            <button class="btn btn-sm btn-outline-primary fw-semibold" onclick="mudarOrdem()">↕️ Ordenar por prazo</button>
+            <span class="text-secondary small ms-auto d-none d-md-inline">💡 Arrasta os cartões entre colunas para mudar o estado</span>
+        </div>
+
+        <div id="aviso-sem-tarefas" class="alert alert-warning text-center rounded-4 py-4" style="display: none;">
+            Não há tarefas para mostrar. Toca a trabalhar! 💪
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="board-coluna col-fazer" ondragover="permitirLargar(event)" ondragleave="sairLargar(event)" ondrop="largar(event, 'Por fazer')">
+                    <div class="board-cabecalho">Por fazer <span class="badge bg-secondary rounded-pill ms-auto" id="count-por-fazer">0</span></div>
+                    <div id="lista-por-fazer" class="board-cartoes"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="board-coluna col-curso" ondragover="permitirLargar(event)" ondragleave="sairLargar(event)" ondrop="largar(event, 'Em curso')">
+                    <div class="board-cabecalho">Em curso <span class="badge bg-warning text-dark rounded-pill ms-auto" id="count-em-curso">0</span></div>
+                    <div id="lista-em-curso" class="board-cartoes"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="board-coluna col-concluida" ondragover="permitirLargar(event)" ondragleave="sairLargar(event)" ondrop="largar(event, 'Concluída')">
+                    <div class="board-cabecalho">Concluída <span class="badge bg-success rounded-pill ms-auto" id="count-concluida">0</span></div>
+                    <div id="lista-concluida" class="board-cartoes"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= ECRA DE CONFIGURACOES / ESTADO DA API ================= -->
+    <div id="ecra-config" class="container my-5 flex-grow-1" style="display: none;">
+        <button class="btn btn-link text-decoration-none px-0 mb-2" onclick="voltarDaConfig()">← Voltar</button>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h2 class="fw-bold texto-grad mb-0">⚙️ Estado da API</h2>
+            <button class="btn btn-tf" onclick="testarApi()">🔄 Testar tudo</button>
+        </div>
+        <p class="text-secondary">Aqui testamos todas as rotas e controllers a sério. O teste cria um utilizador, um projeto e uma tarefa de teste, faz todas as operações (criar, listar, editar, apagar) e no fim apaga tudo — por isso não fica nada na base de dados.</p>
+
+        <div class="card cartao shadow-sm">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Método</th>
+                            <th scope="col">Endereço</th>
+                            <th scope="col">Responsável</th>
+                            <th scope="col">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-config"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: subtarefas (checklist) ================= -->
+    <div class="modal fade" id="modal-subtarefas" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">☑️ Subtarefas</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="sub-titulo" class="fw-semibold mb-2"></div>
+                    <div class="progress mb-1" style="height: 8px;" role="progressbar" aria-label="Progresso das subtarefas">
+                        <div id="sub-barra" class="progress-bar bg-success" style="width: 0%;"></div>
+                    </div>
+                    <div id="sub-percent" class="small text-secondary mb-3"></div>
+                    <ul id="lista-subtarefas" class="list-group mb-3"></ul>
+                    <div class="d-flex gap-2">
+                        <label for="sub-nova" class="visually-hidden">Nova subtarefa</label>
+                        <input type="text" id="sub-nova" class="form-control" placeholder="Nova subtarefa">
+                        <button class="btn btn-tf px-4" onclick="adicionarSubtarefa()">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: confirmar apagar tarefa ================= -->
+    <div class="modal fade" id="modal-apagar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">Apagar tarefa</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">Tens a certeza que queres apagar esta tarefa? Esta ação não tem volta.</div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" onclick="apagarTarefaConfirmado()">Apagar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: confirmar apagar projeto ================= -->
+    <div class="modal fade" id="modal-apagar-projeto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">Apagar projeto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">Tens a certeza que queres apagar este projeto? As tarefas do projeto também são apagadas.</div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" onclick="apagarProjetoConfirmado()">Apagar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: criar projeto ================= -->
+    <div class="modal fade" id="modal-projeto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">Novo Projeto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="projeto-nome" class="form-label fw-semibold">Nome do projeto</label>
+                        <input type="text" id="projeto-nome" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="projeto-desc" class="form-label fw-semibold">Descrição</label>
+                        <input type="text" id="projeto-desc" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-tf px-4" onclick="guardarProjeto()">Criar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: membros do projeto ================= -->
+    <div class="modal fade" id="modal-membros" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">👥 Membros do projeto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 class="h6 text-secondary">Pessoas no projeto:</h3>
+                    <ul id="lista-membros" class="list-group mb-4"></ul>
+                    <h3 class="h6 text-secondary">Juntar uma pessoa:</h3>
+                    <div class="d-flex gap-2">
+                        <label for="select-utilizador" class="visually-hidden">Escolher utilizador</label>
+                        <select id="select-utilizador" class="form-select"></select>
+                        <button class="btn btn-tf px-4" onclick="juntarMembro()">Juntar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: relatorio ================= -->
+    <div class="modal fade" id="modal-relatorio" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">📊 Relatório do projeto</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body" id="conteudo-relatorio"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: criar / editar tarefa ================= -->
+    <div class="modal fade" id="modal-tarefa" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold" id="titulo-modal-tarefa">Nova Tarefa</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="tarefa-titulo" class="form-label fw-semibold">Título</label>
+                        <input type="text" id="tarefa-titulo" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tarefa-desc" class="form-label fw-semibold">Descrição</label>
+                        <input type="text" id="tarefa-desc" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tarefa-link" class="form-label fw-semibold">Link / Anexo (opcional)</label>
+                        <input type="url" id="tarefa-link" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="tarefa-responsavel" class="form-label fw-semibold">Responsável</label>
+                            <input type="text" id="tarefa-responsavel" class="form-control" placeholder="Ex: Nelson">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tarefa-data" class="form-label fw-semibold">Prazo</label>
+                            <input type="date" id="tarefa-data" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label for="tarefa-status" class="form-label fw-semibold">Estado</label>
+                            <select id="tarefa-status" class="form-select">
+                                <option value="Por fazer">⏳ Por fazer</option>
+                                <option value="Em curso">🚧 Em curso</option>
+                                <option value="Concluída">✅ Concluída</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-tf px-4" onclick="guardarTarefa()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: a minha conta ================= -->
+    <div class="modal fade" id="modal-conta" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h2 class="modal-title h5 fw-bold">⚙️ A minha conta</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="conta-nome" class="form-label fw-semibold">Nome</label>
+                        <input type="text" id="conta-nome" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="conta-email" class="form-label fw-semibold">Email</label>
+                        <input type="email" id="conta-email" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="conta-password" class="form-label fw-semibold">Password nova</label>
+                        <input type="password" id="conta-password" class="form-control" placeholder="Deixa vazio para manter a atual">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-tf px-4" onclick="guardarConta()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= TOAST (mensagens) ================= -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div id="toast-texto" class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="text-center py-3 text-secondary small">
+        &copy; 2026 - TaskFlow - Equipa: Diogo, Nelson, Alexandre e Bruno - Formador Nuno Carapito
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
