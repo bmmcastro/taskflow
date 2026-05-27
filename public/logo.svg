@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="TaskFlow">
+    <defs>
+        <linearGradient id="tfGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fbbf24"/>
+            <stop offset="0.55" stop-color="#db2777"/>
+            <stop offset="1" stop-color="#4f46e5"/>
+        </linearGradient>
+    </defs>
+    <rect width="64" height="64" rx="16" fill="url(#tfGrad)"/>
+    <!-- sol do algarve -->
+    <circle cx="32" cy="27" r="8" fill="#fff"/>
+    <!-- visto das tarefas dentro do sol -->
+    <path d="M28.5 27 l 2.5 2.5 l 5 -6" fill="none" stroke="#db2777" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- parentesis de codigo (programar para a web) -->
+    <path d="M18 20 l -5 7 l 5 7" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M46 20 l 5 7 l -5 7" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- ondas do mar -->
+    <path d="M14 45 q 4.5 -4 9 0 t 9 0 t 9 0 t 9 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity="0.95"/>
+    <path d="M14 53 q 4.5 -4 9 0 t 9 0 t 9 0 t 9 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity="0.7"/>
+</svg>
