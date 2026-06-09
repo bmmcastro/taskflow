@@ -25,7 +25,7 @@ recurso, mais a parte do frontend correspondente.
 
 ## O que cada um fez
 
-### Bruno — líder do projeto
+### Bruno 
 Coordenou a equipa e ficou com um pouco mais de trabalho:
 - Configuração inicial (`index.js`, ligação à base de dados em `utils/db.js`) e todo o script SQL.
 - **Tarefas** (rota + controller + model): listar, criar, relatório, atualizar e apagar.
