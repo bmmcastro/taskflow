@@ -79,7 +79,7 @@ Organizámos por **recurso**: cada pessoa fez o caminho completo do seu recurso 
 | **Nelson** | **Projetos e membros** | criar/listar/apagar projetos e listar/juntar/remover membros (rota+controller+model); ecrã dos projetos e o relatório |
 | **Alexandre** | **Subtarefas** | listar, criar, marcar/desmarcar e apagar subtarefas (rota+controller+model); e a página "Estado da API" |
 
-> O **Bruno** liderou o projeto e ficou com um pouco mais de trabalho: além das tarefas (o recurso central), fez toda a configuração/base de dados e a estrutura geral do frontend.
+> O **Bruno** : além das tarefas (o recurso central), fez toda a configuração/base de dados e a estrutura geral do frontend.
 
 ---
 
