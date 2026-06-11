@@ -63,7 +63,7 @@ CREATE TABLE subtarefas (
 
 -- ===== dados de exemplo para podermos testar =====
 
--- a nossa equipa (a password de todos e' 1234, mas guardada com hash sha256)
+-- a nossa equipa (as passwords sao guardadas com hash sha256, nunca em texto simples)
 INSERT INTO utilizadores (nome, email, password) VALUES ('Bruno', 'bruno@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
 INSERT INTO utilizadores (nome, email, password) VALUES ('Diogo', 'diogo@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
 INSERT INTO utilizadores (nome, email, password) VALUES ('Nelson', 'nelson@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');

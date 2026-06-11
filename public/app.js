@@ -56,6 +56,7 @@ function mostrarMensagem(texto, cor) {
 function mostrarEcra(id) {
     document.getElementById("ecra-inicio").style.display = "none";
     document.getElementById("ecra-sobre").style.display = "none";
+    document.getElementById("ecra-faq").style.display = "none";
     document.getElementById("ecra-login").style.display = "none";
     document.getElementById("ecra-projetos").style.display = "none";
     document.getElementById("ecra-tarefas").style.display = "none";
@@ -217,6 +218,11 @@ window.voltarAoInicio = function () {
 window.abrirSobre = function () {
     mostrarEcra("ecra-sobre");
     verificarEstadoApi(); //o Alexandre meteu aqui um teste rapido aos endereços
+};
+
+//pagina de ajuda / faq (funciona com ou sem login)
+window.abrirFaq = function () {
+    mostrarEcra("ecra-faq");
 };
 
 //testa os endereços GET principais e mostra se respondem (so leitura, nao mexe na bd)
@@ -1016,26 +1022,33 @@ async function executarTeste(chave) {
 
     //--- leituras simples (nao mexem em dados) ---
     if (chave === "get-utilizadores") return await pedir("GET", "/utilizadores");
-    if (chave === "post-login") return await pedir("POST", "/utilizadores/login", { email: "bruno@taskflow.pt", password: "1234" });
+    if (chave === "post-login") {
+        //criamos uma conta so para o teste, fazemos login com ela e apagamos
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
+        if (!u.dados || !u.dados.id) return u;
+        const r = await pedir("POST", "/utilizadores/login", { email: email, password: "teste123" });
+        await pedir("DELETE", "/utilizadores/" + u.dados.id);
+        return r;
+    }
     if (chave === "get-projetos") return await pedir("GET", "/projetos?utilizador_id=" + meu);
     if (chave === "get-tarefas") return await pedir("GET", "/tarefas?projeto_id=1");
     if (chave === "get-relatorio") return await pedir("GET", "/tarefas/relatorio?projeto_id=1");
 
     //--- utilizadores (criamos um de teste e apagamos) ---
     if (chave === "post-registo") {
-        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "1234" });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
         if (u.dados && u.dados.id) await pedir("DELETE", "/utilizadores/" + u.dados.id);
         return u;
     }
     if (chave === "patch-utilizador") {
-        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "1234" });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
         if (!u.dados || !u.dados.id) return u;
         const r = await pedir("PATCH", "/utilizadores/" + u.dados.id, { nome: "Teste 2", email: email, password: "" });
         await pedir("DELETE", "/utilizadores/" + u.dados.id);
         return r;
     }
     if (chave === "delete-utilizador") {
-        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "1234" });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
         if (!u.dados || !u.dados.id) return u;
         return await pedir("DELETE", "/utilizadores/" + u.dados.id);
     }
@@ -1060,7 +1073,7 @@ async function executarTeste(chave) {
     }
     if (chave === "post-membros") {
         const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
-        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "1234" });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
         if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
         const r = await pedir("POST", "/projetos/" + p.dados.id + "/membros", { utilizador_id: u.dados.id });
         await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
@@ -1069,7 +1082,7 @@ async function executarTeste(chave) {
     }
     if (chave === "delete-membro") {
         const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
-        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "1234" });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
         if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
         await pedir("POST", "/projetos/" + p.dados.id + "/membros", { utilizador_id: u.dados.id });
         const r = await pedir("DELETE", "/projetos/" + p.dados.id + "/membros/" + u.dados.id);

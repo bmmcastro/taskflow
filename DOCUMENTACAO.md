@@ -139,7 +139,7 @@ O `index.html` tem o aspeto da página (feito com Bootstrap). O `app.js` fala co
    npm install
    npm start
    ```
-5. Abrir o browser em **http://localhost:3000** e fazer login com `bruno@taskflow.pt` / `1234`.
+5. Abrir o browser em **http://localhost:3000** e criar uma conta em **Registar** para entrar.
 
 ---
 

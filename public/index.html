@@ -121,6 +121,69 @@
             background: rgba(109, 40, 217, .1);
         }
 
+        /* ===== faq / como usar ===== */
+        .faq-num {
+            flex: 0 0 auto;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: #7c3aed; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .mock {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, .08);
+            background: #fff;
+            color: #212529;
+            max-width: 460px;
+        }
+        .mock-top {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 12px;
+            background: #f1f3f5;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .mock-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .mock-url {
+            margin-left: 8px;
+            font-size: .72rem; color: #868e96;
+            background: #fff; border-radius: 20px;
+            padding: 2px 10px;
+        }
+        .mock-body { padding: 16px; font-size: .85rem; }
+        .mock-lbl { font-size: .72rem; color: #868e96; display: block; margin-top: 6px; }
+        .mock-input {
+            border: 1px solid #dee2e6; border-radius: 8px;
+            padding: 6px 10px; background: #f8f9fa; color: #495057;
+        }
+        .mock-btn {
+            margin-top: 12px; text-align: center;
+            background: #7c3aed; color: #fff;
+            border-radius: 20px; padding: 7px; font-weight: 600;
+        }
+        .mock-btn-sm { background: #7c3aed; color: #fff; border-radius: 20px; padding: 3px 10px; font-size: .72rem; }
+        .mock-mini { font-size: .72rem; color: #868e96; }
+        .mock-h { font-size: .9rem; }
+        .mock-card {
+            border: 1px solid #e9ecef; border-radius: 10px;
+            padding: 8px 10px; margin-top: 8px;
+        }
+        .mock-col-h { font-size: .72rem; font-weight: 700; text-align: center; margin-bottom: 4px; }
+        .mock-task {
+            border: 1px solid #e9ecef; border-radius: 8px;
+            padding: 6px; font-size: .72rem; box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .mock-check { padding: 3px 0; }
+        .mock-tick {
+            display: inline-block; width: 16px; height: 16px;
+            border-radius: 50%; text-align: center; line-height: 16px;
+            font-size: .7rem; margin-right: 6px;
+            background: #e9ecef; color: #adb5bd;
+        }
+        .mock-tick.on { background: #7c3aed; color: #fff; }
+        .mock-stat { font-size: 1.4rem; font-weight: 700; color: #7c3aed; }
+
         /* ===== ecra do login ===== */
         .ecra-login-fundo {
             background: var(--grad);
@@ -206,6 +269,7 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link fw-semibold" href="#" onclick="voltarAoInicio(); return false;"><i class="bi bi-house-door me-1"></i>Início</a></li>
                     <li class="nav-item"><a class="nav-link fw-semibold" href="#" onclick="abrirSobre(); return false;"><i class="bi bi-info-circle me-1"></i>Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#" onclick="abrirFaq(); return false;"><i class="bi bi-question-circle me-1"></i>FAQ</a></li>
                 </ul>
 
                 <!-- zona da conta (direita) -->
@@ -383,6 +447,192 @@
                 <div class="col-md-6"><div class="card cartao shadow-sm h-100"><div class="card-body"><h3 class="h6 fw-bold mb-1">Alexandre</h3><p class="text-secondary small mb-0">Recurso das <strong>Subtarefas</strong> e a página "Estado da API".</p></div></div></div>
             </div>
         </section>
+    </div>
+
+
+    <!-- ================= ECRA FAQ / COMO USAR ================= -->
+    <div id="ecra-faq" class="container my-5 flex-grow-1" style="display: none;">
+        <div class="text-center mb-5">
+            <div class="func-icone mx-auto mb-3" aria-hidden="true"><i class="bi bi-life-preserver"></i></div>
+            <h1 class="fw-bold texto-grad">Como usar o TaskFlow</h1>
+            <p class="lead text-secondary mb-0">Um guia rápido e as perguntas mais comuns. Em poucos passos já estás a organizar o trabalho da tua equipa.</p>
+        </div>
+
+        <!-- passos com mini "screenshots" da interface -->
+        <section class="mb-5" aria-labelledby="faq-passos">
+            <h2 id="faq-passos" class="h4 fw-bold mb-4">Passo a passo</h2>
+
+            <!-- passo 1 -->
+            <div class="row g-4 align-items-center mb-5">
+                <div class="col-lg-6">
+                    <div class="mock shadow-sm">
+                        <div class="mock-top"><span class="mock-dot" style="background:#ff5f57"></span><span class="mock-dot" style="background:#febc2e"></span><span class="mock-dot" style="background:#28c840"></span><span class="mock-url">taskflow.algarit.pt</span></div>
+                        <div class="mock-body">
+                            <div class="text-center mb-2"><span class="badge rounded-pill" style="background:#7c3aed">TaskFlow</span></div>
+                            <label class="mock-lbl">Email</label>
+                            <div class="mock-input">o-teu-email@exemplo.pt</div>
+                            <label class="mock-lbl">Password</label>
+                            <div class="mock-input">••••</div>
+                            <div class="mock-btn">Entrar</div>
+                            <div class="text-center mock-mini mt-2">Ainda não tens conta? Criar conta</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="faq-num">1</div>
+                        <div>
+                            <h3 class="h5 fw-bold">Cria conta ou entra</h3>
+                            <p class="text-secondary mb-0">Carrega em <strong>Registar</strong> para criares a tua conta (nome, email e password) ou em <strong>Entrar</strong> se já tens conta. É rápido e a tua password fica guardada de forma segura.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- passo 2 -->
+            <div class="row g-4 align-items-center mb-5 flex-lg-row-reverse">
+                <div class="col-lg-6">
+                    <div class="mock shadow-sm">
+                        <div class="mock-top"><span class="mock-dot" style="background:#ff5f57"></span><span class="mock-dot" style="background:#febc2e"></span><span class="mock-dot" style="background:#28c840"></span><span class="mock-url">taskflow.algarit.pt</span></div>
+                        <div class="mock-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2"><strong class="mock-h">Os meus projetos</strong><span class="mock-btn-sm">+ Novo projeto</span></div>
+                            <div class="mock-card"><strong>Projeto Final</strong><div class="mock-mini">O nosso trabalho de fim de curso</div></div>
+                            <div class="mock-card"><strong>Site da pastelaria</strong><div class="mock-mini">loja online simples</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="faq-num">2</div>
+                        <div>
+                            <h3 class="h5 fw-bold">Cria um projeto e junta a equipa</h3>
+                            <p class="text-secondary mb-0">Em <strong>Projetos</strong>, carrega em <strong>Novo projeto</strong>, dá-lhe um nome e uma descrição. Depois abre o projeto e usa <strong>Membros</strong> para juntar os colegas. Quem cria o projeto fica como responsável.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- passo 3 -->
+            <div class="row g-4 align-items-center mb-5">
+                <div class="col-lg-6">
+                    <div class="mock shadow-sm">
+                        <div class="mock-top"><span class="mock-dot" style="background:#ff5f57"></span><span class="mock-dot" style="background:#febc2e"></span><span class="mock-dot" style="background:#28c840"></span><span class="mock-url">taskflow.algarit.pt</span></div>
+                        <div class="mock-body">
+                            <div class="row g-2">
+                                <div class="col-4"><div class="mock-col-h" style="color:#6c757d">Por fazer</div><div class="mock-task">Publicar no cPanel<div class="mock-mini">👤 bruno</div></div></div>
+                                <div class="col-4"><div class="mock-col-h" style="color:#7c3aed">Em curso</div><div class="mock-task">Design e PWA<div class="mock-mini">👤 bruno</div></div></div>
+                                <div class="col-4"><div class="mock-col-h" style="color:#28a745">Concluída</div><div class="mock-task">Login<div class="mock-mini">👤 diogo</div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="faq-num">3</div>
+                        <div>
+                            <h3 class="h5 fw-bold">Organiza as tarefas no quadro</h3>
+                            <p class="text-secondary mb-0">Dentro do projeto tens um quadro com 3 colunas: <strong>Por fazer</strong>, <strong>Em curso</strong> e <strong>Concluída</strong>. Cria tarefas com <strong>Nova tarefa</strong> e <strong>arrasta os cartões</strong> de uma coluna para a outra para mudar o estado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- passo 4 -->
+            <div class="row g-4 align-items-center mb-5 flex-lg-row-reverse">
+                <div class="col-lg-6">
+                    <div class="mock shadow-sm">
+                        <div class="mock-top"><span class="mock-dot" style="background:#ff5f57"></span><span class="mock-dot" style="background:#febc2e"></span><span class="mock-dot" style="background:#28c840"></span><span class="mock-url">taskflow.algarit.pt</span></div>
+                        <div class="mock-body">
+                            <strong class="mock-h">Subtarefas</strong>
+                            <div class="progress my-2" style="height:8px"><div class="progress-bar" style="width:66%;background:#7c3aed"></div></div>
+                            <div class="mock-mini mb-2">2 de 3 concluídas</div>
+                            <div class="mock-check"><span class="mock-tick on">✓</span> Criar as tabelas</div>
+                            <div class="mock-check"><span class="mock-tick on">✓</span> Ligar à base de dados</div>
+                            <div class="mock-check"><span class="mock-tick">○</span> Afinar o visual</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="faq-num">4</div>
+                        <div>
+                            <h3 class="h5 fw-bold">Divide em subtarefas (checklist)</h3>
+                            <p class="text-secondary mb-0">Abre uma tarefa e adiciona <strong>subtarefas</strong>. À medida que as marcas como feitas, o cartão mostra a <strong>percentagem de conclusão</strong> numa barra de progresso.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- passo 5 -->
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-6">
+                    <div class="mock shadow-sm">
+                        <div class="mock-top"><span class="mock-dot" style="background:#ff5f57"></span><span class="mock-dot" style="background:#febc2e"></span><span class="mock-dot" style="background:#28c840"></span><span class="mock-url">taskflow.algarit.pt</span></div>
+                        <div class="mock-body">
+                            <strong class="mock-h">Relatório do projeto</strong>
+                            <div class="row g-2 text-center my-2">
+                                <div class="col-4"><div class="mock-stat">10</div><div class="mock-mini">tarefas</div></div>
+                                <div class="col-4"><div class="mock-stat">8</div><div class="mock-mini">concluídas</div></div>
+                                <div class="col-4"><div class="mock-stat">4</div><div class="mock-mini">pessoas</div></div>
+                            </div>
+                            <div class="mock-mini">bruno 5 · nelson 2 · alexandre 2 · diogo 1</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="faq-num">5</div>
+                        <div>
+                            <h3 class="h5 fw-bold">Vê o relatório</h3>
+                            <p class="text-secondary mb-0">No projeto, abre o <strong>Relatório</strong> para veres o total de tarefas, quantas estão concluídas e quantas estão atribuídas a cada pessoa da equipa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- perguntas frequentes -->
+        <section class="mb-4" aria-labelledby="faq-perguntas">
+            <h2 id="faq-perguntas" class="h4 fw-bold mb-3">Perguntas frequentes</h2>
+            <div class="accordion" id="acordeaoFaq">
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq1">Preciso de instalar alguma coisa?</button></h3>
+                    <div id="fq1" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">Não. Abre o site no browser. Se quiseres, podes <strong>instalar como app</strong> (PWA) no telemóvel ou no PC — no Chrome/Edge aparece o botão de instalar.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq2">Como crio uma conta?</button></h3>
+                    <div id="fq2" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">Carrega em <strong>Registar</strong> na barra de cima, preenche o nome, o email e a password, e ficas logo com sessão iniciada.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq3">Como mudo uma tarefa de estado?</button></h3>
+                    <div id="fq3" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary"><strong>Arrasta o cartão</strong> para a coluna que queres (Por fazer, Em curso ou Concluída). Também podes editar a tarefa e escolher o estado.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq4">Como junto colegas ao projeto?</button></h3>
+                    <div id="fq4" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">Abre o projeto e vai a <strong>Membros</strong>. Escolhe a pessoa da lista e adiciona. O criador do projeto não pode ser removido.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq5">O que são as subtarefas e a percentagem?</button></h3>
+                    <div id="fq5" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">São uma checklist dentro de cada tarefa. À medida que as marcas como feitas, o cartão mostra a percentagem concluída numa barra de progresso.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq6">Posso pôr um link numa tarefa?</button></h3>
+                    <div id="fq6" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">Sim. Ao criar ou editar a tarefa podes pôr um link (ex.: Google Drive, Figma). Ele aparece no cartão.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq7">Tem modo escuro?</button></h3>
+                    <div id="fq7" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">Tem. O botão de <strong>sol/lua</strong> no canto direito da barra muda entre o modo claro e o escuro, e fica guardado.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fq8">Os meus dados estão seguros?</button></h3>
+                    <div id="fq8" class="accordion-collapse collapse" data-bs-parent="#acordeaoFaq"><div class="accordion-body text-secondary">A password é guardada com <strong>hash</strong> (nunca em texto simples) e o site funciona em <strong>https</strong>. Podes mudar a tua password em <strong>Conta</strong>.</div></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="text-center mt-4">
+            <a class="btn btn-primary" href="#" onclick="irParaRegisto(); return false;"><i class="bi bi-rocket-takeoff me-1"></i>Começar agora</a>
+        </div>
     </div>
 
 
