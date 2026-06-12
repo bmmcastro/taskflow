@@ -74,7 +74,7 @@ Organizámos por **recurso**: cada pessoa fez o caminho completo do seu recurso 
 
 | Pessoa | Responsável por | O que inclui |
 |--------|-----------------|--------------|
-| **Bruno** | Configuração + **Tarefas** + liderança do frontend | `index.js`, `utils/db.js`, `tarefas.sql`; tarefas (listar, criar, relatório, atualizar, apagar) em rota+controller+model; o quadro estilo Trello e a página inicial no frontend |
+| **Bruno** | Configuração + **Tarefas** + frontend | `index.js`, `utils/db.js`, `tarefas.sql`; tarefas (listar, criar, relatório, atualizar, apagar) em rota+controller+model; o quadro estilo Trello e a página inicial no frontend |
 | **Diogo** | **Utilizadores** | registar, login, listar, gestão de conta e apagar utilizador (rota+controller+model); ecrãs de login/registo e "a minha conta" |
 | **Nelson** | **Projetos e membros** | criar/listar/apagar projetos e listar/juntar/remover membros (rota+controller+model); ecrã dos projetos e o relatório |
 | **Alexandre** | **Subtarefas** | listar, criar, marcar/desmarcar e apagar subtarefas (rota+controller+model); e a página "Estado da API" |
