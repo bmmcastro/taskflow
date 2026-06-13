@@ -79,7 +79,7 @@ INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 3);
 INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 4);
 
 -- as tarefas reais do projeto, com o responsavel a dizer quem fez mesmo cada parte
--- o Bruno ficou com um pouco mais por ter liderado o projeto (config + tarefas + frontend)
+-- dividido por recurso: tarefas, utilizadores, projetos e subtarefas
 INSERT INTO tarefas (titulo, descricao, criador, responsavel, status, data_conclusao, projeto_id)
 VALUES ('Configuracao e base de dados', 'arranque do servidor, ligacao ao PostgreSQL e estrutura MVC', 'bruno', 'bruno', 'Concluída', '2026-05-12', 1);
 INSERT INTO tarefas (titulo, descricao, criador, responsavel, status, data_conclusao, projeto_id)
