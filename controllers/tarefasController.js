@@ -43,18 +43,35 @@ const relatorio = async (req, res) => {
     const projeto_id = req.query.projeto_id;
     try {
         const tarefas = await tarefasModel.listarParaRelatorio(projeto_id);
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
         let total = tarefas.length;
         let concluidas = 0;
+        let emCurso = 0;
+        let porFazer = 0;
+        let atrasadas = 0;
         const porPessoa = {};
 
         tarefas.forEach(t => {
             if (t.status === 'Concluída') {
                 concluidas++;
+            } else if (t.status === 'Em curso') {
+                emCurso++;
+            } else {
+                porFazer++;
+            }
+            //tarefa atrasada: ainda nao esta concluida e ja passou o prazo
+            if (t.status !== 'Concluída' && t.data_conclusao && new Date(t.data_conclusao) < hoje) {
+                atrasadas++;
             }
             porPessoa[t.responsavel] = (porPessoa[t.responsavel] || 0) + 1;
         });
 
-        return res.send({ total: total, concluidas: concluidas, porPessoa: porPessoa });
+        //percentagem do projeto que ja esta concluida
+        const percentagem = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+
+        return res.send({ total, concluidas, emCurso, porFazer, atrasadas, percentagem, porPessoa });
     } catch (err) {
         return res.status(500).send('Ocorreu um erro no servidor');
     }

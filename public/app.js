@@ -867,10 +867,21 @@ window.abrirRelatorio = function () {
     fetch(API + "/tarefas/relatorio?projeto_id=" + projetoAtual.id)
         .then(res => res.json())
         .then(dados => {
+            const pct = dados.percentagem || 0;
             let html = `
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Progresso do projeto</strong>
+                    <span class="badge bg-success">${pct}% concluído</span>
+                </div>
+                <div class="progress mb-3" style="height: 12px;" role="progressbar" aria-label="Percentagem concluída" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-success" style="width: ${pct}%;"></div>
+                </div>
                 <ul class="list-unstyled">
                     <li>📝 <strong>Total de tarefas:</strong> ${dados.total}</li>
                     <li>✅ <strong>Concluídas:</strong> ${dados.concluidas}</li>
+                    <li>🔄 <strong>Em curso:</strong> ${dados.emCurso || 0}</li>
+                    <li>🕒 <strong>Por fazer:</strong> ${dados.porFazer || 0}</li>
+                    <li>⚠️ <strong>Atrasadas:</strong> ${dados.atrasadas || 0}</li>
                 </ul>
                 <hr>
                 <strong>Tarefas por pessoa:</strong>
