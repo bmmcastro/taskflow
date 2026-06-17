@@ -74,6 +74,82 @@ function fecharMenuMobile() {
     }
 }
 
+
+//NAVEGACAO POR PAGINAS (router pelo hash do url) - Bruno
+//cada ecra tem o seu proprio endereco (#sobre, #projetos, #projeto/3, ...), por isso
+//o botao "voltar" do browser e o refresh funcionam e da para partilhar o link.
+
+//muda o endereco; o evento "hashchange" e que mostra depois o ecra certo
+function irPara(rota) {
+    const novo = "#" + rota;
+    if (location.hash === novo) {
+        aplicarRota(); //ja estamos neste endereco, mas voltamos a carregar (ex: atualizar a lista)
+    } else {
+        location.hash = novo;
+    }
+}
+
+//le o endereco e mostra o ecra correspondente
+function aplicarRota() {
+    const bruto = location.hash.replace(/^#\/?/, "");
+    const partes = bruto.split("/");
+    const rota = partes[0] || (utilizadorLogado ? "projetos" : "inicio");
+
+    //estes ecras so se veem com login feito
+    const precisaLogin = ["projetos", "projeto", "estado-api"];
+    if (precisaLogin.indexOf(rota) !== -1 && !utilizadorLogado) {
+        irPara("inicio");
+        return;
+    }
+
+    if (rota === "inicio") {
+        mostrarEcra("ecra-inicio");
+    } else if (rota === "sobre") {
+        mostrarEcra("ecra-sobre");
+        verificarEstadoApi();
+    } else if (rota === "faq") {
+        mostrarEcra("ecra-faq");
+    } else if (rota === "entrar") {
+        mostrarEcra("ecra-login");
+        mostrarLogin();
+    } else if (rota === "registar") {
+        mostrarEcra("ecra-login");
+        mostrarRegisto();
+    } else if (rota === "projetos") {
+        mostrarEcra("ecra-projetos");
+        carregarProjetos();
+    } else if (rota === "estado-api") {
+        mostrarEcra("ecra-config");
+        testarApi();
+    } else if (rota === "projeto") {
+        abrirBoardPorId(Number(partes[1]));
+    } else {
+        irPara(utilizadorLogado ? "projetos" : "inicio");
+    }
+}
+
+//abre o quadro de um projeto pelo id (se a lista ainda nao foi carregada, vai busca-la primeiro)
+function abrirBoardPorId(id) {
+    if (!id) { irPara("projetos"); return; }
+    const p = projetos.find(x => Number(x.id) === id);
+    if (p) { mostrarBoard(p); return; }
+    fetch(API + "/projetos?utilizador_id=" + utilizadorLogado.id)
+        .then(res => res.json())
+        .then(lista => {
+            projetos = lista;
+            const encontrado = projetos.find(x => Number(x.id) === id);
+            if (encontrado) { mostrarBoard(encontrado); } else { irPara("projetos"); }
+        })
+        .catch(() => irPara("projetos"));
+}
+
+function mostrarBoard(projeto) {
+    projetoAtual = { id: projeto.id, nome: projeto.nome };
+    document.getElementById("titulo-projeto").innerText = projeto.nome;
+    mostrarEcra("ecra-tarefas");
+    carregarTarefas();
+}
+
 //a navbar esta sempre visivel, mas o menu muda conforme temos login feito ou nao
 function atualizarNavbar() {
     const logado = utilizadorLogado !== null;
@@ -195,34 +271,31 @@ window.sair = function () {
     projetoAtual = null;
     localStorage.removeItem("utilizador");
     atualizarNavbar();
-    mostrarEcra("ecra-inicio");
+    irPara("inicio");
 };
 
 //PAGINA INICIAL - Bruno
 //botoes da pagina inicial que levam ao login ou ao registo
 window.irParaLogin = function () {
-    mostrarEcra("ecra-login");
-    mostrarLogin();
+    irPara("entrar");
 };
 
 window.irParaRegisto = function () {
-    mostrarEcra("ecra-login");
-    mostrarRegisto();
+    irPara("registar");
 };
 
 window.voltarAoInicio = function () {
-    mostrarEcra("ecra-inicio");
+    irPara("inicio");
 };
 
 //pagina "sobre" (funciona com ou sem login)
 window.abrirSobre = function () {
-    mostrarEcra("ecra-sobre");
-    verificarEstadoApi(); //o Alexandre meteu aqui um teste rapido aos endereços
+    irPara("sobre");
 };
 
 //pagina de ajuda / faq (funciona com ou sem login)
 window.abrirFaq = function () {
-    mostrarEcra("ecra-faq");
+    irPara("faq");
 };
 
 //testa os endereços GET principais e mostra se respondem (so leitura, nao mexe na bd)
@@ -295,8 +368,7 @@ function verificarEstadoApi() {
 function entrarNaApp() {
     document.getElementById("nome-utilizador").innerText = utilizadorLogado.nome;
     atualizarNavbar();
-    mostrarEcra("ecra-projetos");
-    carregarProjetos();
+    irPara("projetos");
 }
 
 
@@ -380,18 +452,12 @@ window.guardarProjeto = function () {
 };
 
 window.abrirProjeto = function (id) {
-    //vamos buscar o projeto pelo id (assim nao metemos o nome no onclick)
-    const projeto = projetos.find(p => p.id === id);
-    if (!projeto) return;
-    projetoAtual = { id: projeto.id, nome: projeto.nome };
-    document.getElementById("titulo-projeto").innerText = projeto.nome;
-    mostrarEcra("ecra-tarefas");
-    carregarTarefas();
+    //cada projeto tem o seu endereco (#projeto/3); o router e que mostra o quadro
+    irPara("projeto/" + id);
 };
 
 window.voltarAosProjetos = function () {
-    mostrarEcra("ecra-projetos");
-    carregarProjetos();
+    irPara("projetos");
 };
 
 //Alexandre - abrir o modal a perguntar se queremos mesmo apagar o projeto
@@ -962,13 +1028,11 @@ const ENDERECOS = [
 ];
 
 window.abrirConfig = function () {
-    mostrarEcra("ecra-config");
-    testarApi();
+    irPara("estado-api");
 };
 
 window.voltarDaConfig = function () {
-    mostrarEcra("ecra-projetos");
-    carregarProjetos();
+    irPara("projetos");
 };
 
 //monta a tabela com todas as linhas a "a testar..."
@@ -1179,12 +1243,14 @@ window.testarApi = async function () {
 
 aplicarTemaGuardado();
 
-//se ja tinhamos feito login antes, entramos logo
+//se ja tinhamos feito login antes, ficamos com a sessao
 const guardado = localStorage.getItem("utilizador");
 if (guardado) {
     utilizadorLogado = JSON.parse(guardado);
-    entrarNaApp();
-} else {
-    atualizarNavbar();
-    mostrarEcra("ecra-inicio");
+    document.getElementById("nome-utilizador").innerText = utilizadorLogado.nome;
 }
+atualizarNavbar();
+
+//o router mostra o ecra certo conforme o endereco (#...) e reage ao botao voltar/avancar
+window.addEventListener("hashchange", aplicarRota);
+aplicarRota();
