@@ -44,4 +44,4 @@ Node.js, Express, Cors, pg, PostgreSQL, HTML, Bootstrap e JavaScript.
    npm install
    npm start
    ```
-5. Abrir o browser em http://localhost:3000 e criar uma conta em **Registar** para entrar.
+5. Abrir o browser em http://localhost:3000 e entrar com a conta de demonstração `demo@taskflow.pt` / `1234` (ou criar a tua em **Registar**).

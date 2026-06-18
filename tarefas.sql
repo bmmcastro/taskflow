@@ -63,20 +63,23 @@ CREATE TABLE subtarefas (
 
 -- ===== dados de exemplo para podermos testar =====
 
--- a nossa equipa (as passwords sao guardadas com hash sha256, nunca em texto simples)
-INSERT INTO utilizadores (nome, email, password) VALUES ('Bruno', 'bruno@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Diogo', 'diogo@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Nelson', 'nelson@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Alexandre', 'alexandre@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
+-- contas da equipa (as passwords sao guardadas com hash sha256, nunca em texto simples)
+INSERT INTO utilizadores (nome, email, password) VALUES ('Bruno', 'bruno@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Diogo', 'diogo@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Nelson', 'nelson@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Alexandre', 'alexandre@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
+-- conta de demonstracao para experimentar a app (demo@taskflow.pt / 1234)
+INSERT INTO utilizadores (nome, email, password) VALUES ('Demo', 'demo@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
 
 -- um projeto de exemplo
 INSERT INTO projetos (nome, descricao, criador_id) VALUES ('Projeto Final', 'O nosso trabalho de fim de curso', 1);
 
--- juntar a equipa toda ao projeto (id 1) como membros
+-- juntar a equipa e a conta demo ao projeto (id 1) como membros
 INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 1);
 INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 2);
 INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 3);
 INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 4);
+INSERT INTO projeto_membros (projeto_id, utilizador_id) VALUES (1, 5);
 
 -- as tarefas reais do projeto, com o responsavel a dizer quem fez mesmo cada parte
 -- dividido por recurso: tarefas, utilizadores, projetos e subtarefas
