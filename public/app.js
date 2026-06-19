@@ -754,12 +754,33 @@ window.mudarOrdem = function () {
     mostrarTarefas();
 };
 
+//enche o select do responsavel so com os membros do projeto
+function preencherResponsaveis(selecionado) {
+    const select = document.getElementById("tarefa-responsavel");
+    select.innerHTML = '<option value="">Escolher membro...</option>';
+    fetch(API + "/projetos/" + projetoAtual.id + "/membros")
+        .then(res => res.json())
+        .then(membros => {
+            membros.forEach(m => {
+                const valor = m.nome.toLowerCase();
+                const op = document.createElement("option");
+                op.value = valor;
+                op.textContent = m.nome;
+                if (selecionado && valor === String(selecionado).toLowerCase()) {
+                    op.selected = true;
+                }
+                select.appendChild(op);
+            });
+        })
+        .catch(() => {});
+}
+
 window.abrirModalTarefa = function () {
     tarefaEmEdicaoId = null;
     document.getElementById("titulo-modal-tarefa").innerText = "Nova Tarefa";
     document.getElementById("tarefa-titulo").value = "";
     document.getElementById("tarefa-desc").value = "";
-    document.getElementById("tarefa-responsavel").value = "";
+    preencherResponsaveis("");
     document.getElementById("tarefa-data").value = "";
     document.getElementById("tarefa-status").value = "Por fazer";
     document.getElementById("tarefa-link").value = "";
@@ -774,7 +795,7 @@ window.editarTarefa = function (id) {
     document.getElementById("titulo-modal-tarefa").innerText = "Editar Tarefa";
     document.getElementById("tarefa-titulo").value = t.titulo;
     document.getElementById("tarefa-desc").value = t.descricao || "";
-    document.getElementById("tarefa-responsavel").value = t.responsavel;
+    preencherResponsaveis(t.responsavel);
     document.getElementById("tarefa-data").value = paraInputData(t.data_conclusao);
     document.getElementById("tarefa-status").value = t.status;
     document.getElementById("tarefa-link").value = t.link || "";
