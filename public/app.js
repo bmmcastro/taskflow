@@ -762,6 +762,8 @@ function preencherResponsaveis(selecionado) {
         .then(res => res.json())
         .then(membros => {
             membros.forEach(m => {
+                //a conta de demonstracao nao e responsavel por tarefas
+                if (m.email === "demo@taskflow.pt") return;
                 const valor = m.nome.toLowerCase();
                 const op = document.createElement("option");
                 op.value = valor;
