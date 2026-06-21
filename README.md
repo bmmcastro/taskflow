@@ -36,14 +36,29 @@ Browser  ->  index.js  ->  routes  ->  controllers  ->  model  ->  base de dados
 
 Node.js, Express, Cors, pg, PostgreSQL, HTML, Bootstrap e JavaScript.
 
-## Como correr
+## Como testar a app (passo a passo)
 
-1. Instalar o PostgreSQL e criar uma base de dados chamada `taskflow`.
-2. Correr o `tarefas.sql` para criar as tabelas e os dados de exemplo.
-3. Em `utils/db.js` mudar a `password` para a do nosso PostgreSQL.
-4. No terminal, dentro da pasta do projeto:
-   ```
-   npm install
-   npm start
-   ```
-5. Abrir o browser em http://localhost:3000 e entrar com a conta de demonstração `demo@taskflow.pt` / `1234` (ou criar a tua em **Registar**).
+O ficheiro **`tarefas.sql`** deixa a base de dados pronta num só passo: cria as 5 tabelas e mete logo os dados de exemplo (5 utilizadores, o projeto "Projeto Final" com membros, 10 tarefas e as respetivas subtarefas). Por isso, depois de montar a BD, a app já vem com conteúdo para testar.
+
+**1. Base de dados (uma vez só)**
+- Instalar o PostgreSQL e criar uma base de dados chamada `taskflow`.
+- Correr o `tarefas.sql` dentro dessa base:
+  - no **pgAdmin**: botão direito na base `taskflow` → Query Tool → colar o `tarefas.sql` → F5;
+  - ou no terminal: `psql -U postgres -d taskflow -f tarefas.sql`.
+
+**2. Ligação à base de dados**
+- Abrir `utils/db.js` e mudar a `password` para a do seu PostgreSQL (por defeito está `a-tua-password`).
+
+**3. Arrancar com o servidor**
+- No terminal, dentro da pasta do projeto:
+  ```
+  npm install
+  npm start
+  ```
+
+**4. Abrir no browser**
+- Ir a http://localhost:3000 e entrar com a conta de demonstração **`demo@taskflow.pt`** / **`1234`**
+  (ou criar uma conta nova em **Registar**).
+
+Depois de entrar: abrir o "Projeto Final" e testar o quadro (arrastar cartões entre colunas), as subtarefas (checklist), os membros e o relatório do projeto. As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `123456`.
+

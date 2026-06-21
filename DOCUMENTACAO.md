@@ -131,15 +131,19 @@ O `index.html` tem o aspeto da página (feito com Bootstrap). O `app.js` fala co
 
 ## 6. Como correr no nosso computador
 
+O `tarefas.sql` deixa a base de dados pronta num só passo: cria as 5 tabelas e mete logo os dados de exemplo (utilizadores, o "Projeto Final" com membros, tarefas e subtarefas).
+
 1. Ter o PostgreSQL instalado e criar uma base de dados chamada `taskflow`.
-2. Correr o `tarefas.sql` (no pgAdmin) para criar as tabelas.
-3. Em `utils/db.js` mudar a `password` para a do nosso PostgreSQL.
+2. Correr o `tarefas.sql` dentro dessa base de dados:
+   - no **pgAdmin**: botão direito na base `taskflow` → Query Tool → colar o `tarefas.sql` → F5;
+   - ou no terminal: `psql -U postgres -d taskflow -f tarefas.sql`.
+3. Em `utils/db.js` mudar a `password` para a do nosso PostgreSQL (por defeito está `a-tua-password`).
 4. Abrir o terminal na pasta do projeto e correr:
    ```
    npm install
    npm start
    ```
-5. Abrir o browser em **http://localhost:3000** e entrar com a conta de demonstração `demo@taskflow.pt` / `1234` (ou criar a tua em **Registar**).
+5. Abrir o browser em **http://localhost:3000** e entrar com a conta de demonstração **`demo@taskflow.pt`** / **`1234`** (ou criar a tua em **Registar**). As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `123456`.
 
 ---
 
