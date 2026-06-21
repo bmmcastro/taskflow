@@ -6,6 +6,8 @@ Projeto final da UC **UC00605 — Programar para a web (server-side)**.
 Formador: Nuno Carapito.
 
 Online: https://taskflow.algarit.pt
+Código: https://github.com/bmmcastro/taskflow
+Login de demonstração: `demo@taskflow.pt` / `1234`
 
 ## Equipa e divisão do trabalho
 
