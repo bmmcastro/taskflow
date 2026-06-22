@@ -79,7 +79,7 @@ Organizámos por **recurso**: cada pessoa fez o caminho completo do seu recurso 
 | **Nelson** | **Projetos e membros** | criar/listar/apagar projetos e listar/juntar/remover membros (rota+controller+model); ecrã dos projetos e o relatório |
 | **Alexandre** | **Subtarefas** | listar, criar, marcar/desmarcar e apagar subtarefas (rota+controller+model); e a página "Estado da API" |
 
-> O **Bruno** : além das tarefas (o recurso central), fez toda a configuração/base de dados e a estrutura geral do frontend.
+> O trabalho foi dividido de forma equilibrada por recurso, entre os quatro elementos da equipa.
 
 ---
 
@@ -143,7 +143,7 @@ O `tarefas.sql` deixa a base de dados pronta num só passo: cria as 5 tabelas e 
    npm install
    npm start
    ```
-5. Abrir o browser em **http://localhost:3000** e entrar com a conta de demonstração **`demo@taskflow.pt`** / **`1234`** (ou criar a tua em **Registar**). As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `123456`.
+5. Abrir o browser em **http://localhost:3000** e entrar com a conta de demonstração **`demo@taskflow.pt`** / **`1234`** (ou criar a tua em **Registar**). As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `1234`.
 
 ---
 

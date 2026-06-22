@@ -60,5 +60,5 @@ O ficheiro **`tarefas.sql`** deixa a base de dados pronta num só passo: cria as
 - Ir a http://localhost:3000 e entrar com a conta de demonstração **`demo@taskflow.pt`** / **`1234`**
   (ou criar uma conta nova em **Registar**).
 
-Depois de entrar: abrir o "Projeto Final" e testar o quadro (arrastar cartões entre colunas), as subtarefas (checklist), os membros e o relatório do projeto. As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `123456`.
+Depois de entrar: abrir o "Projeto Final" e testar o quadro (arrastar cartões entre colunas), as subtarefas (checklist), os membros e o relatório do projeto. As contas da equipa (`bruno@taskflow.pt`, `diogo@taskflow.pt`, `nelson@taskflow.pt`, `alexandre@taskflow.pt`) usam a password `1234`.
 

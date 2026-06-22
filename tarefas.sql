@@ -64,10 +64,10 @@ CREATE TABLE subtarefas (
 -- ===== dados de exemplo para podermos testar =====
 
 -- contas da equipa (as passwords sao guardadas com hash sha256, nunca em texto simples)
-INSERT INTO utilizadores (nome, email, password) VALUES ('Bruno', 'bruno@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Diogo', 'diogo@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Nelson', 'nelson@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
-INSERT INTO utilizadores (nome, email, password) VALUES ('Alexandre', 'alexandre@taskflow.pt', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Bruno', 'bruno@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Diogo', 'diogo@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Nelson', 'nelson@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
+INSERT INTO utilizadores (nome, email, password) VALUES ('Alexandre', 'alexandre@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
 -- conta de demonstracao para experimentar a app (demo@taskflow.pt / 1234)
 INSERT INTO utilizadores (nome, email, password) VALUES ('Demo', 'demo@taskflow.pt', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
 
