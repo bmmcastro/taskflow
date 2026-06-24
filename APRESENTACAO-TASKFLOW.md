@@ -49,8 +49,8 @@ O recurso central das **tarefas** (listar, criar, editar, apagar e mudar o estad
 **Fase 4 — Frontend, quadro e design (final de maio / início de junho)**
 A página inicial, a barra de navegação e o **quadro estilo Trello** com arrastar e largar (drag and drop). Depois o logótipo, o **tema claro/escuro** e a conversão em **PWA** (instalável no telemóvel, com manifest e service worker).
 
-**Fase 5 — Relatório, testes e publicação (junho)**
-A página de **Estado da API** (testa todos os endpoints sem deixar lixo na base de dados), o **relatório** do projeto com estatísticas e, por fim, a **publicação online** no cPanel (`taskflow.algarit.pt`) e os últimos ajustes (responsividade, acessibilidade e segurança).
+**Fase 5 — Relatório, testes, convites e publicação (junho)**
+A página de **Estado da API** (testa todos os endpoints sem deixar lixo na base de dados), o **relatório** do projeto com estatísticas e os **convites por email** (o criador convida uma pessoa, que recebe um email com o link para aceitar). Por fim, a **publicação online** no cPanel (`taskflow.algarit.pt`) e os últimos ajustes (responsividade, acessibilidade e segurança).
 
 ---
 
@@ -65,12 +65,15 @@ Cada ficheiro tem, no topo, o nome de quem o fez. A divisão por recurso:
 | **Nelson** | **Projetos e membros** | criar/listar/apagar projetos e listar/juntar/remover membros (rota+controller+model); o ecrã dos projetos e o relatório |
 | **Alexandre** | **Subtarefas** + Estado da API | listar, criar, marcar/desmarcar e apagar subtarefas (rota+controller+model); a página "Estado da API" |
 
+> A funcionalidade dos **convites por email** foi feita pelos quatro em conjunto: o **Bruno** tratou do envio de email (`utils/email.js`, com nodemailer), da tabela `convites` e do ecrã de aceitar; o **Nelson** do endpoint de convidar (no recurso dos projetos) e do botão na janela dos membros; o **Diogo** do model dos convites; e o **Alexandre** do controller de aceitar o convite.
+
 ---
 
 ## 5. Funcionalidades principais (para demonstrar)
 
 - **Contas e login** — registo, login e gestão de conta, com a password guardada em **hash sha256** (nunca em texto simples).
 - **Projetos e equipas** — criar projetos e juntar/remover membros (o criador não pode ser removido).
+- **Convites por email** — o criador convida uma pessoa por email; a pessoa recebe o link para aceitar (e registar, se ainda não tiver conta) e fica como membro.
 - **Quadro estilo Trello** — 3 colunas por estado, com **arrastar e largar** para mudar o estado; aviso de tarefa atrasada.
 - **Subtarefas** — checklist por tarefa com **percentagem de conclusão**.
 - **Relatório do projeto** — total, concluídas, por estados e contagem por pessoa, com a **percentagem concluída**.

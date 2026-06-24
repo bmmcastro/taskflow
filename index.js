@@ -12,6 +12,7 @@ const tarefasRoutes = require('./routes/tarefas');
 const utilizadoresRoutes = require('./routes/utilizadores');
 const projetosRoutes = require('./routes/projetos');
 const subtarefasRoutes = require('./routes/subtarefas');
+const convitesRoutes = require('./routes/convites');
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use('/tarefas', tarefasRoutes);
 app.use('/utilizadores', utilizadoresRoutes);
 app.use('/projetos', projetosRoutes);
 app.use('/subtarefas', subtarefasRoutes);
+app.use('/convites', convitesRoutes);
 
 //no cpanel a porta vem do servidor; no nosso pc e a 3000
 const PORT = process.env.PORT || 3000;

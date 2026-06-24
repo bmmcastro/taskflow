@@ -20,6 +20,8 @@ Dividimos por recurso — cada um fez a rota, o controller e o model do seu recu
 | Nelson | **Projetos e membros** e o relatório do projeto |
 | Alexandre | **Subtarefas** (checklist) e a página "Estado da API" |
 
+A funcionalidade dos **convites por email** foi feita pelos quatro em conjunto (envio de email, endpoint de convidar, model e controller de aceitar, e o ecrã de aceitação).
+
 ## Como está organizado (MVC)
 
 ```
@@ -34,7 +36,7 @@ Browser  ->  index.js  ->  routes  ->  controllers  ->  model  ->  base de dados
 
 ## Tecnologias
 
-Node.js, Express, Cors, pg, PostgreSQL, HTML, Bootstrap e JavaScript.
+Node.js, Express, Cors, pg, PostgreSQL, HTML, Bootstrap e JavaScript e nodemailer (envio de emails).
 
 ## Como testar a app (passo a passo)
 

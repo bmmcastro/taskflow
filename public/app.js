@@ -61,6 +61,7 @@ function mostrarEcra(id) {
     document.getElementById("ecra-projetos").style.display = "none";
     document.getElementById("ecra-tarefas").style.display = "none";
     document.getElementById("ecra-config").style.display = "none";
+    document.getElementById("ecra-convite").style.display = "none";
     //deixamos vazio para o ecra voltar ao seu display natural
     document.getElementById(id).style.display = "";
     fecharMenuMobile();
@@ -123,6 +124,8 @@ function aplicarRota() {
         testarApi();
     } else if (rota === "projeto") {
         abrirBoardPorId(Number(partes[1]));
+    } else if (rota === "convite") {
+        abrirConvite(partes[1]);
     } else {
         irPara(utilizadorLogado ? "projetos" : "inicio");
     }
@@ -144,7 +147,7 @@ function abrirBoardPorId(id) {
 }
 
 function mostrarBoard(projeto) {
-    projetoAtual = { id: projeto.id, nome: projeto.nome };
+    projetoAtual = { id: projeto.id, nome: projeto.nome, criador_id: projeto.criador_id };
     document.getElementById("titulo-projeto").innerText = projeto.nome;
     mostrarEcra("ecra-tarefas");
     carregarTarefas();
@@ -368,8 +371,20 @@ function verificarEstadoApi() {
 function entrarNaApp() {
     document.getElementById("nome-utilizador").innerText = utilizadorLogado.nome;
     atualizarNavbar();
-    irPara("projetos");
+    //se havia um convite a espera de aceitacao (veio do email), voltamos la
+    const pendente = localStorage.getItem("convite-pendente");
+    if (pendente) {
+        localStorage.removeItem("convite-pendente");
+        irPara("convite/" + pendente);
+    } else {
+        irPara("projetos");
+    }
 }
+
+//guarda o token do convite enquanto a pessoa vai fazer login ou registo
+window.prepararConvitePendente = function (token) {
+    localStorage.setItem("convite-pendente", token);
+};
 
 
 //PROJETOS - Nelson
@@ -920,6 +935,8 @@ window.abrirMembros = function () {
         })
         .catch(() => mostrarMensagem("Erro a carregar os utilizadores", "danger"));
 
+    //o bloco de convidar por email so aparece para o criador do projeto
+    mostrarBlocoConvidarSeForCriador();
     abrirModal("modal-membros");
 };
 
@@ -947,6 +964,123 @@ window.removerMembro = function (utilizadorId) {
             abrirMembros(); //voltar a carregar a lista
         })
         .catch(() => mostrarMensagem("Não foi possível remover o membro", "danger"));
+};
+
+
+//CONVITES POR EMAIL - Nelson (o criador convida) + Bruno (o ecra de aceitar)
+
+//so o criador ve o bloco de convidar; tambem mostramos os convites pendentes
+function mostrarBlocoConvidarSeForCriador() {
+    const souCriador = projetoAtual && Number(projetoAtual.criador_id) === Number(utilizadorLogado.id);
+    const bloco = document.getElementById("bloco-convidar");
+    bloco.style.display = souCriador ? "" : "none";
+    if (souCriador) {
+        document.getElementById("email-convidar").value = "";
+        carregarConvites();
+    }
+}
+
+//lista os convites pendentes do projeto (janela dos membros)
+function carregarConvites() {
+    fetch(API + "/projetos/" + projetoAtual.id + "/convites")
+        .then(res => res.json())
+        .then(lista => {
+            const ul = document.getElementById("lista-convites");
+            ul.innerHTML = "";
+            if (lista.length === 0) {
+                ul.innerHTML = '<li class="list-group-item text-secondary small border-0 px-0">Sem convites pendentes.</li>';
+                return;
+            }
+            lista.forEach(c => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex align-items-center px-0";
+                li.innerHTML = '<i class="bi bi-envelope me-2 text-secondary"></i><span class="small">' + escapar(c.email_convidado) + ' <span class="text-secondary">(pendente)</span></span>';
+                ul.appendChild(li);
+            });
+        })
+        .catch(() => {});
+}
+
+//o criador mete um email e envia o convite
+window.convidarEmail = function () {
+    const email = document.getElementById("email-convidar").value.trim();
+    if (!email) { mostrarMensagem("Escreve um email", "danger"); return; }
+    fetch(API + "/projetos/" + projetoAtual.id + "/convidar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, criador_id: utilizadorLogado.id })
+    })
+        .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+        .then(() => {
+            mostrarMensagem("Convite enviado para " + email, "success");
+            carregarConvites();
+            document.getElementById("email-convidar").value = "";
+        })
+        .catch(() => mostrarMensagem("Não foi possível enviar o convite (verifica o email)", "danger"));
+};
+
+//ecra de aceitar o convite (chegado pelo link do email: #convite/TOKEN)
+function abrirConvite(token) {
+    if (!token) { irPara(utilizadorLogado ? "projetos" : "inicio"); return; }
+    mostrarEcra("ecra-convite");
+    const caixa = document.getElementById("conteudo-convite");
+
+    fetch(API + "/convites/" + token)
+        .then(res => {
+            if (!res.ok) { throw new Error("nao deu"); }
+            return res.json();
+        })
+        .then(d => {
+            if (d.status === "aceite") {
+                caixa.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size:3rem;"></i>' +
+                    '<h2 class="h4 fw-bold mt-3">Convite já aceite</h2>' +
+                    '<p class="text-secondary">Já és membro do projeto <strong>' + escapar(d.projeto) + '</strong>.</p>' +
+                    (utilizadorLogado ? '<button class="btn btn-tf px-4" onclick="irPara(\'projeto/' + d.projeto_id + '\')">Abrir o projeto</button>' : '');
+                return;
+            }
+            //a pessoa ainda nao esta logada
+            if (!utilizadorLogado) {
+                if (d.ja_registado) {
+                    caixa.innerHTML = '<i class="bi bi-envelope-paper" style="font-size:3rem;"></i>' +
+                        '<h2 class="h4 fw-bold mt-3">Convite para o projeto ' + escapar(d.projeto) + '</h2>' +
+                        '<p class="text-secondary">' + escapar(d.criador) + ' convidou-te (<strong>' + escapar(d.email) + '</strong>) para este projeto.</p>' +
+                        '<p class="mb-3">Entra na tua conta para aceitar.</p>' +
+                        '<button class="btn btn-tf px-4" onclick="prepararConvitePendente(\'' + token + '\'); irPara(\'entrar\')">Entrar para aceitar</button>';
+                } else {
+                    caixa.innerHTML = '<i class="bi bi-envelope-paper" style="font-size:3rem;"></i>' +
+                        '<h2 class="h4 fw-bold mt-3">Convite para o projeto ' + escapar(d.projeto) + '</h2>' +
+                        '<p class="text-secondary">' + escapar(d.criador) + ' convidou-te (<strong>' + escapar(d.email) + '</strong>) para este projeto.</p>' +
+                        '<p class="mb-3">Cria a tua conta para aceitar o convite.</p>' +
+                        '<button class="btn btn-tf px-4" onclick="prepararConvitePendente(\'' + token + '\'); irPara(\'registar\')">Registar para aceitar</button>';
+                }
+                return;
+            }
+            //a pessoa ja esta logada -> botao de aceitar
+            caixa.innerHTML = '<i class="bi bi-envelope-paper" style="font-size:3rem;"></i>' +
+                '<h2 class="h4 fw-bold mt-3">Convite para o projeto ' + escapar(d.projeto) + '</h2>' +
+                '<p class="text-secondary">' + escapar(d.criador) + ' convidou-te para este projeto.</p>' +
+                '<button class="btn btn-tf px-4" onclick="aceitarConvite(\'' + token + '\', ' + d.projeto_id + ')">Aceitar convite</button>';
+        })
+        .catch(() => {
+            caixa.innerHTML = '<i class="bi bi-x-circle-fill text-danger" style="font-size:3rem;"></i>' +
+                '<h2 class="h4 fw-bold mt-3">Convite inválido</h2>' +
+                '<p class="text-secondary">Este convite não existe ou já expirou.</p>';
+        });
+}
+
+//aceita o convite: o utilizador fica membro do projeto
+window.aceitarConvite = function (token, projetoId) {
+    fetch(API + "/convites/" + token + "/aceitar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ utilizador_id: utilizadorLogado.id })
+    })
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
+        .then(() => {
+            mostrarMensagem("És agora membro do projeto!", "success");
+            irPara("projeto/" + projetoId);
+        })
+        .catch(() => mostrarMensagem("Não foi possível aceitar o convite (tem de ser a conta certa)", "danger"));
 };
 
 

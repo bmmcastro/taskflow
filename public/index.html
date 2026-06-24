@@ -810,6 +810,21 @@
     </div>
 
 
+    <!-- ================= ECRA: ACEITAR CONVITE ================= -->
+    <div id="ecra-convite" class="container my-5 flex-grow-1" style="display: none;">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card cartao shadow-sm">
+                    <div class="card-body p-4 p-md-5 text-center" id="conteudo-convite">
+                        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">A carregar...</span></div>
+                        <p class="text-secondary mt-2 mb-0">A carregar o convite...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- ================= MODAL: subtarefas (checklist) ================= -->
     <div class="modal fade" id="modal-subtarefas" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -915,6 +930,16 @@
                         <label for="select-utilizador" class="visually-hidden">Escolher utilizador</label>
                         <select id="select-utilizador" class="form-select"></select>
                         <button class="btn btn-tf px-4" onclick="juntarMembro()">Juntar</button>
+                    </div>
+                    <div id="bloco-convidar" style="display:none;">
+                        <h3 class="h6 text-secondary mt-4">Convidar por email <span class="badge bg-primary-subtle text-primary-emphasis">criador</span></h3>
+                        <p class="text-secondary small mb-2">A pessoa recebe um email com o link para aceitar (e registar, se ainda não tiver conta).</p>
+                        <div class="input-group">
+                            <label for="email-convidar" class="visually-hidden">Email para convidar</label>
+                            <input type="email" id="email-convidar" class="form-control" placeholder="email@exemplo.pt">
+                            <button class="btn btn-tf px-4" onclick="convidarEmail()">Convidar</button>
+                        </div>
+                        <ul id="lista-convites" class="list-group list-group-flush mt-3"></ul>
                     </div>
                 </div>
             </div>

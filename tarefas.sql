@@ -3,6 +3,7 @@
 
 -- apagamos primeiro as tabelas que dependem das outras
 -- assim podemos correr este script as vezes que quisermos sem dar erro
+DROP TABLE IF EXISTS convites;
 DROP TABLE IF EXISTS subtarefas;
 DROP TABLE IF EXISTS tarefas;
 DROP TABLE IF EXISTS projeto_membros;
@@ -58,6 +59,18 @@ CREATE TABLE subtarefas (
     tarefa_id INTEGER REFERENCES tarefas(id) ON DELETE CASCADE,
     descricao VARCHAR(255) NOT NULL,
     concluida BOOLEAN DEFAULT false
+);
+
+
+-- tabela dos convites (quando o criador convida alguem por email para o projeto)
+CREATE TABLE convites (
+    id SERIAL PRIMARY KEY,
+    projeto_id INTEGER REFERENCES projetos(id),
+    criador_id INTEGER REFERENCES utilizadores(id),
+    email_convidado VARCHAR(100) NOT NULL,
+    token VARCHAR(64) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'pendente',
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
