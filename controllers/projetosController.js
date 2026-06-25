@@ -1,6 +1,8 @@
 // projetos e membros (Nelson)
 
+const crypto = require('crypto');
 const projetosModel = require('../model/projetosModel');
+const { enviarEmail } = require('../utils/email');
 
 // projetos onde o user e membro
 const listarProjetos = async (req, res) => {
@@ -93,11 +95,73 @@ const apagarProjeto = async (req, res) => {
     }
 }
 
+// o criador convida uma pessoa por email para o projeto
+const convidar = async (req, res) => {
+    const projeto_id = req.params.id;
+    const email_convidado = (req.body.email || '').trim().toLowerCase();
+    const criador_id = req.body.criador_id;
+
+    //so o criador e que pode convidar
+    const criador = await projetosModel.procurarCriador(projeto_id);
+    if (String(criador) !== String(criador_id)) {
+        return res.status(403).send('So o criador pode convidar');
+    }
+
+    //validar o email (tem de ter @ e um ponto)
+    if (!email_convidado || email_convidado.indexOf('@') === -1 || email_convidado.indexOf('.') === -1) {
+        return res.status(400).send('Email invalido');
+    }
+
+    try {
+        //token unico para o convite (para o link de aceitar)
+        const token = crypto.randomBytes(24).toString('hex');
+        await projetosModel.criarConvite(projeto_id, criador_id, email_convidado, token);
+
+        //o endereco de aceitar (no servidor e https://taskflow.algarit.pt)
+        const base = 'https://taskflow.algarit.pt';
+        const link = base + '/#convite/' + token;
+
+        //email para a pessoa convidada
+        await enviarEmail(
+            email_convidado,
+            'Foste convidado para um projeto no TaskFlow',
+            'Ola!\n\nFoste convidado para um projeto no TaskFlow. Para aceitar, abre este link:\n' + link + '\n\nSe ainda nao tens conta, o link ajuda-te a registar.\n\nEquipa TaskFlow'
+        );
+
+        //email para o criador a confirmar que convidou
+        const dono = await projetosModel.procurarEmailCriador(projeto_id);
+        if (dono) {
+            await enviarEmail(
+                dono,
+                'Convite enviado no TaskFlow',
+                'Ola!\n\nConvidaste ' + email_convidado + ' para o teu projeto no TaskFlow.\nQuando a pessoa aceitar, fica automaticamente como membro.\n\nEquipa TaskFlow'
+            );
+        }
+
+        return res.send('Convite enviado');
+    } catch (err) {
+        return res.status(500).send('Ocorreu um erro no servidor');
+    }
+};
+
+// os convites pendentes do projeto (para mostrar na janela dos membros)
+const listarConvites = async (req, res) => {
+    const projeto_id = req.params.id;
+    try {
+        const lista = await projetosModel.convitesDoProjeto(projeto_id);
+        return res.send(lista);
+    } catch (err) {
+        return res.status(500).send('Ocorreu um erro no servidor');
+    }
+};
+
 module.exports = {
     listarProjetos,
     criarProjeto,
     listarMembros,
     juntarMembro,
     removerMembro,
-    apagarProjeto
+    apagarProjeto,
+    convidar,
+    listarConvites
 }

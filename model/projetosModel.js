@@ -38,11 +38,30 @@ async function procurarCriador(projeto_id) {
     return resultado.rows[0] ? resultado.rows[0].criador_id : null;
 }
 
+// devolve o email de quem criou o projeto (para mandar a confirmacao do convite)
+async function procurarEmailCriador(projeto_id) {
+    const resultado = await pool.query('SELECT utilizadores.email FROM utilizadores JOIN projetos ON projetos.criador_id = utilizadores.id WHERE projetos.id = $1', [projeto_id]);
+    return resultado.rows[0] ? resultado.rows[0].email : null;
+}
+
 // apaga tudo do projeto: tarefas, membros e o projeto
 async function apagar(projeto_id) {
     await pool.query('DELETE FROM tarefas WHERE projeto_id = $1', [projeto_id]);
     await pool.query('DELETE FROM projeto_membros WHERE projeto_id = $1', [projeto_id]);
     await pool.query('DELETE FROM projetos WHERE id = $1', [projeto_id]);
+}
+
+// ---- convites por email (Nelson) ----
+
+// cria o registo do convite na base de dados
+async function criarConvite(projeto_id, criador_id, email_convidado, token) {
+    await pool.query('INSERT INTO convites (projeto_id, criador_id, email_convidado, token) VALUES ($1, $2, $3, $4)', [projeto_id, criador_id, email_convidado, token]);
+}
+
+// os convites pendentes do projeto (para mostrar na janela dos membros)
+async function convitesDoProjeto(projeto_id) {
+    const resultado = await pool.query('SELECT email_convidado, data_criacao FROM convites WHERE projeto_id = $1 AND status = $2 ORDER BY data_criacao DESC', [projeto_id, 'pendente']);
+    return resultado.rows;
 }
 
 module.exports = {
@@ -52,5 +71,8 @@ module.exports = {
     juntarMembro,
     removerMembro,
     procurarCriador,
-    apagar
+    procurarEmailCriador,
+    apagar,
+    criarConvite,
+    convitesDoProjeto
 }
