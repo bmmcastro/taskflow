@@ -44,8 +44,9 @@ async function procurarEmailCriador(projeto_id) {
     return resultado.rows[0] ? resultado.rows[0].email : null;
 }
 
-// apaga tudo do projeto: tarefas, membros e o projeto
+// apaga tudo do projeto: convites, tarefas, membros e o projeto
 async function apagar(projeto_id) {
+    await pool.query('DELETE FROM convites WHERE projeto_id = $1', [projeto_id]);
     await pool.query('DELETE FROM tarefas WHERE projeto_id = $1', [projeto_id]);
     await pool.query('DELETE FROM projeto_membros WHERE projeto_id = $1', [projeto_id]);
     await pool.query('DELETE FROM projetos WHERE id = $1', [projeto_id]);

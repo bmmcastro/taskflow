@@ -117,28 +117,32 @@ const convidar = async (req, res) => {
         const token = crypto.randomBytes(24).toString('hex');
         await projetosModel.criarConvite(projeto_id, criador_id, email_convidado, token);
 
-        //o endereco de aceitar (no servidor e https://taskflow.algarit.pt)
-        const base = 'https://taskflow.algarit.pt';
-        const link = base + '/#convite/' + token;
+        //so mandamos os emails de verdade (enviar_email pode ser false para os testes da API)
+        if (req.body.enviar_email !== false) {
+            //o endereco de aceitar (no servidor e https://taskflow.algarit.pt)
+            const base = 'https://taskflow.algarit.pt';
+            const link = base + '/#convite/' + token;
 
-        //email para a pessoa convidada
-        await enviarEmail(
-            email_convidado,
-            'Foste convidado para um projeto no TaskFlow',
-            'Ola!\n\nFoste convidado para um projeto no TaskFlow. Para aceitar, abre este link:\n' + link + '\n\nSe ainda nao tens conta, o link ajuda-te a registar.\n\nEquipa TaskFlow'
-        );
-
-        //email para o criador a confirmar que convidou
-        const dono = await projetosModel.procurarEmailCriador(projeto_id);
-        if (dono) {
+            //email para a pessoa convidada
             await enviarEmail(
-                dono,
-                'Convite enviado no TaskFlow',
-                'Ola!\n\nConvidaste ' + email_convidado + ' para o teu projeto no TaskFlow.\nQuando a pessoa aceitar, fica automaticamente como membro.\n\nEquipa TaskFlow'
+                email_convidado,
+                'Foste convidado para um projeto no TaskFlow',
+                'Ola!\n\nFoste convidado para um projeto no TaskFlow. Para aceitar, abre este link:\n' + link + '\n\nSe ainda nao tens conta, o link ajuda-te a registar.\n\nEquipa TaskFlow'
             );
+
+            //email para o criador a confirmar que convidou
+            const dono = await projetosModel.procurarEmailCriador(projeto_id);
+            if (dono) {
+                await enviarEmail(
+                    dono,
+                    'Convite enviado no TaskFlow',
+                    'Ola!\n\nConvidaste ' + email_convidado + ' para o teu projeto no TaskFlow.\nQuando a pessoa aceitar, fica automaticamente como membro.\n\nEquipa TaskFlow'
+                );
+            }
         }
 
-        return res.send('Convite enviado');
+        //devolvemos o token (assim o criador pode copiar o link a mao e a pagina de testes consegue encadear)
+        return res.send({ mensagem: 'Convite enviado', token: token, projeto_id: Number(projeto_id) });
     } catch (err) {
         return res.status(500).send('Ocorreu um erro no servidor');
     }
