@@ -81,6 +81,8 @@ Organizámos por **recurso**: cada pessoa fez o caminho completo do seu recurso 
 
 > O trabalho foi dividido de forma equilibrada por recurso, entre os quatro elementos da equipa.
 
+> A funcionalidade dos **convites por email** foi feita pelos quatro em conjunto: o **Bruno** tratou do envio de email (`utils/email.js`, com nodemailer), da tabela `convites` no SQL e do ecrã de aceitar o convite; o **Nelson** do endpoint de convidar (no recurso dos projetos) e do botão na janela dos membros; o **Diogo** do model dos convites (ir buscar pelo token e ver se o email já tem conta); e o **Alexandre** do controller de aceitar o convite (ver + aceitar, ficando a pessoa como membro).
+
 ---
 
 ## 4. Explicação ficheiro a ficheiro
@@ -117,6 +119,10 @@ O `index.html` tem o aspeto da página (feito com Bootstrap). O `app.js` fala co
 | POST   | /projetos/:id/membros | Junta um membro |
 | DELETE | /projetos/:id/membros/:utilizadorId | Remove um membro (menos o criador) |
 | DELETE | /projetos/:id | Apaga um projeto e as suas tarefas |
+| GET    | /projetos/:id/convites | Convites pendentes do projeto |
+| POST   | /projetos/:id/convidar | Convida uma pessoa por email (só o criador) |
+| GET    | /convites/:token | Mostra um convite (pelo link do email) |
+| POST   | /convites/:token/aceitar | Aceita o convite (fica membro do projeto) |
 | GET    | /tarefas?projeto_id=1 | Tarefas de um projeto |
 | POST   | /tarefas | Cria uma tarefa |
 | GET    | /tarefas/relatorio?projeto_id=1 | Estatísticas do projeto |

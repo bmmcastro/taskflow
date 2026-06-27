@@ -29,18 +29,22 @@ recurso, mais a parte do frontend correspondente.
 - Configuração inicial (`index.js`, ligação à base de dados em `utils/db.js`) e todo o script SQL.
 - **Tarefas** (rota + controller + model): listar, criar, relatório, atualizar e apagar.
 - No frontend: a página inicial e o quadro estilo Trello (arrastar e largar).
+- **Convites** (com a equipa): o envio de email (`utils/email.js`, com nodemailer), a tabela `convites` e o ecrã de aceitar o convite.
 
 ### Diogo
 - **Utilizadores** (rota + controller + model): registar, login, listar, gestão de conta e apagar.
 - No frontend: os ecrãs de login/registo e a janela "A minha conta".
+- **Convites** (com a equipa): o model dos convites (ir buscar pelo token e ver se o email já tem conta).
 
 ### Nelson
 - **Projetos e membros** (rota + controller + model): criar, listar e apagar projetos; listar, juntar e remover membros (o criador não pode ser removido).
 - No frontend: o ecrã dos projetos e o relatório.
+- **Convites** (com a equipa): o endpoint de convidar por email (no recurso dos projetos) e o botão na janela dos membros.
 
 ### Alexandre
 - **Subtarefas** (rota + controller + model): listar, criar, marcar/desmarcar e apagar.
 - A página **"Estado da API"** que testa todas as rotas.
+- **Convites** (com a equipa): o controller de aceitar o convite (ver pelo token + aceitar, ficando a pessoa como membro).
 
 ---
 
