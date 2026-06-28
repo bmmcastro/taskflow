@@ -1010,8 +1010,8 @@ window.convidarEmail = function () {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email, criador_id: utilizadorLogado.id })
     })
-        .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
-        .then(() => {
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
+        .then(dados => {
             mostrarMensagem("Convite enviado para " + email, "success");
             carregarConvites();
             document.getElementById("email-convidar").value = "";
@@ -1173,6 +1173,10 @@ const ENDERECOS = [
     { chave: 'post-membros',      metodo: 'POST',   caminho: '/projetos/:id/membros', quem: 'Nelson',     descricao: 'Junta um utilizador ao projeto',         codigo: "fetch('/projetos/' + id + '/membros', { method: 'POST', body: JSON.stringify({ utilizador_id }) })" },
     { chave: 'delete-membro',     metodo: 'DELETE', caminho: '/projetos/:id/membros/:uid', quem: 'Nelson', descricao: 'Remove um membro (menos o criador)',      codigo: "fetch('/projetos/' + id + '/membros/' + utilizadorId, { method: 'DELETE' })" },
     { chave: 'delete-projeto',    metodo: 'DELETE', caminho: '/projetos/:id',         quem: 'Nelson', descricao: 'Apaga o projeto (so o criador)',          codigo: "fetch('/projetos/' + id + '?utilizador_id=' + meuId, { method: 'DELETE' })" },
+    { chave: 'post-convidar',     metodo: 'POST',   caminho: '/projetos/:id/convidar',  quem: 'Nelson',    descricao: 'Convida uma pessoa por email (so o criador)', codigo: "fetch('/projetos/' + id + '/convidar', { method: 'POST', body: JSON.stringify({ email, criador_id }) })" },
+    { chave: 'get-convites',      metodo: 'GET',    caminho: '/projetos/:id/convites',  quem: 'Nelson',    descricao: 'Convites pendentes do projeto',               codigo: "fetch('/projetos/' + id + '/convites')" },
+    { chave: 'get-convite',       metodo: 'GET',    caminho: '/convites/:token',        quem: 'Diogo',     descricao: 'Mostra um convite (pelo link do email)',       codigo: "fetch('/convites/' + token)" },
+    { chave: 'post-aceitar',      metodo: 'POST',   caminho: '/convites/:token/aceitar', quem: 'Alexandre', descricao: 'Aceita o convite (fica membro do projeto)',    codigo: "fetch('/convites/' + token + '/aceitar', { method: 'POST', body: JSON.stringify({ utilizador_id }) })" },
     { chave: 'get-tarefas',       metodo: 'GET',    caminho: '/tarefas',              quem: 'Bruno',     descricao: 'Lista as tarefas de um projeto',         codigo: "fetch('/tarefas?projeto_id=' + id)" },
     { chave: 'get-relatorio',     metodo: 'GET',    caminho: '/tarefas/relatorio',    quem: 'Bruno',    descricao: 'Estatisticas do projeto',                codigo: "fetch('/tarefas/relatorio?projeto_id=' + id)" },
     { chave: 'post-tarefas',      metodo: 'POST',   caminho: '/tarefas',              quem: 'Bruno',     descricao: 'Cria uma tarefa',                        codigo: "fetch('/tarefas', { method: 'POST', body: JSON.stringify({ titulo, responsavel, status, data_conclusao, projeto_id }) })" },
@@ -1318,6 +1322,46 @@ async function executarTeste(chave) {
         if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
         await pedir("POST", "/projetos/" + p.dados.id + "/membros", { utilizador_id: u.dados.id });
         const r = await pedir("DELETE", "/projetos/" + p.dados.id + "/membros/" + u.dados.id);
+        await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
+        await pedir("DELETE", "/utilizadores/" + u.dados.id);
+        return r;
+    }
+
+    //--- convites por email (criamos um projeto de teste e um utilizador; nao enviamos email de verdade) ---
+    if (chave === "post-convidar") {
+        const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
+        if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
+        //convidar sem mandar email de verdade (enviar_email: false)
+        const r = await pedir("POST", "/projetos/" + p.dados.id + "/convidar", { email: email, criador_id: meu, enviar_email: false });
+        await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
+        await pedir("DELETE", "/utilizadores/" + u.dados.id);
+        return r;
+    }
+    if (chave === "get-convites") {
+        const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
+        if (!p.dados || !p.dados.id) return p;
+        await pedir("POST", "/projetos/" + p.dados.id + "/convidar", { email: email, criador_id: meu, enviar_email: false });
+        const r = await pedir("GET", "/projetos/" + p.dados.id + "/convites");
+        await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
+        return r;
+    }
+    if (chave === "get-convite") {
+        const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
+        if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
+        const c = await pedir("POST", "/projetos/" + p.dados.id + "/convidar", { email: email, criador_id: meu, enviar_email: false });
+        const r = (c.dados && c.dados.token) ? await pedir("GET", "/convites/" + c.dados.token) : c;
+        await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
+        await pedir("DELETE", "/utilizadores/" + u.dados.id);
+        return r;
+    }
+    if (chave === "post-aceitar") {
+        const p = await pedir("POST", "/projetos", { nome: "Projeto teste", descricao: "x", utilizador_id: meu });
+        const u = await pedir("POST", "/utilizadores/registo", { nome: "Teste", email: email, password: "teste123" });
+        if (!p.dados || !p.dados.id || !u.dados || !u.dados.id) return p;
+        const c = await pedir("POST", "/projetos/" + p.dados.id + "/convidar", { email: email, criador_id: meu, enviar_email: false });
+        const r = (c.dados && c.dados.token) ? await pedir("POST", "/convites/" + c.dados.token + "/aceitar", { utilizador_id: u.dados.id }) : c;
         await pedir("DELETE", "/projetos/" + p.dados.id + "?utilizador_id=" + meu);
         await pedir("DELETE", "/utilizadores/" + u.dados.id);
         return r;
